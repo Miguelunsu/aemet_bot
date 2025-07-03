@@ -18,3 +18,6 @@ Entrar a un contenedor (modo terminal)
     docker exec -it nombre_del_contenedor bash
         O directamente al cliente de psql (si tienes el contenedor corriendo):
             docker exec -it nombre_del_contenedor psql -U postgres
+
+Meterme en el contenedor:
+    docker exec -it aemet-bot-app-1 sh

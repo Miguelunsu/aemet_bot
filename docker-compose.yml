@@ -13,6 +13,7 @@ services:
 
   app:
     build: .
+    network_mode: "host"
     volumes:
       - ./app:/app
     depends_on:
