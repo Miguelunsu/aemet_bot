@@ -1,0 +1,20 @@
+Iniciar (crear y correr los contenedores):
+    docker-compose up -d
+        -d: lo ejecuta en segundo plano ("detached").
+    docker-compose up -d --build
+        recontruye imagenes
+
+Parar contenedores sin borrar nada:
+    docker-compose down
+
+Parar y borrar también los volúmenes:
+    docker-compose down -v
+
+Ver logs en tiempo real (por ejemplo de la aemet-bot-app-1. Si quiero de todos, quito aemet-bot-app-1)
+    docker-compose logs -f aemet-bot-app-1
+        -f significa follow, es decir, seguirlos en vivo
+
+Entrar a un contenedor (modo terminal)
+    docker exec -it nombre_del_contenedor bash
+        O directamente al cliente de psql (si tienes el contenedor corriendo):
+            docker exec -it nombre_del_contenedor psql -U postgres
