@@ -2,6 +2,7 @@ import time
 import sys
 from fetch.aemet_client import get_data_url_from_aemet, download_data_from_url
 from utils.csv_writer import csv_writer_tmax
+from utils.parser import parser_temp_max
 import csv
 import collections
 
@@ -29,41 +30,42 @@ def main():
             tamax = i.get("ubi", "Nan")
             ubi = i.get("tamax", "Nan")
             print(f"Estación {idema}, {fint}, {tamax}, {ubi}")
+
+        ruta_csv_estaciones = 'estaciones.csv'
+        datos_estaciones = []
+
+        with open(ruta_csv_estaciones, newline='', encoding='utf-8') as csvfile:
+            lector = csv.DictReader(csvfile)
+            for fila in lector:
+                datos_estaciones.append({
+                    'idema': fila['idema'],
+                    'ubi': fila['ubi'],
+                    'lon': float(fila['lon']),
+                    'lat': float(fila['lat'])
+                })
         
-        # Temperaturas extremas
-        idema_target = 5783
-        endpoint = f'https://opendata.aemet.es/opendata/api/valores/climatologicos/valoresextremos/parametro/T/estacion/{idema_target}'
-        print(f"Llamando get_data_url_from_aemet (temp. extremas). Estacion: {idema_target}", flush=True)
+        i_counter = 0
+        # Bucle temperaturas extremas
+        for i_estacion in datos_estaciones:
+            i_counter = i_counter + 1
+            print("", idema)
+            print(f"Tmax in station: {idema}. Station {i_counter}/{len(datos_estaciones)}")
+            print("Time sleep: 10")
+            time.sleep(10)
+            idema = i_estacion.get("idema")
+            dicc_estacion_tmax = parser_temp_max(idema)
 
-        print(f"Temp. Extr. Estacion: {idema_target} -> data_url: {data_url}", flush=True)
-        data_url = get_data_url_from_aemet(endpoint)
-        print("Llamando download_data_from_url...", flush=True)
-        data2 = download_data_from_url(data_url) # Lista de diccionarios de estaciones meteo
-        idema = data2.get("indicativo", "Nan")
-        temMax_lista = data2.get("temMax", "Nan")
-        diaMax_lista = data2.get("diaMax", "Nan")
-        anioMax_lista = data2.get("anioMax", "Nan")
-        mesMax = data2.get("mesMax", "Nan")
+            temMax = dicc_estacion_tmax.get("temMax")
+            diaMax = dicc_estacion_tmax.get("diaMax")
+            mesMax = dicc_estacion_tmax.get("mesMax")
+            anioMax = dicc_estacion_tmax.get("anioMax")
 
-        if isinstance(temMax_lista, list) and temMax_lista:
-            temMax = temMax_lista[-1]
-        else:
-            temMax = "Nan"
-
-        if isinstance(diaMax_lista, list) and diaMax_lista:
-            diaMax = diaMax_lista[-1]
-        else:
-            diaMax = "Nan"
-
-        if isinstance(anioMax_lista, list) and anioMax_lista:
-            anioMax = anioMax_lista[-1]
-        else:
-            anioMax = "Nan"
-
-        print(f"Estación {idema}. Temp. max. Valor: {temMax}. Fecha: {diaMax}/{mesMax}/{anioMax}")
-        
-        csv_writer_tmax(idema, temMax, diaMax, mesMax, anioMax, True)
-        csv_writer_tmax(idema, temMax, diaMax, mesMax, anioMax, False)
+            if i_counter == 1:
+                # CSV writer con header
+                csv_writer_tmax(idema, temMax, diaMax, mesMax, anioMax, True)
+            else:
+                # CSV writer sin header
+                csv_writer_tmax(idema, temMax, diaMax, mesMax, anioMax, False)
 
     except:
         print(f"Error en main", flush=True)

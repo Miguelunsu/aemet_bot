@@ -31,8 +31,18 @@ def get_data_url_from_aemet(endpoint, max_retries=20, delay=5):
             time.sleep(delay)
             attempts += 1
     raise RuntimeError(f"No se pudo obtener la URL de datos tras {max_retries} intentos.")
-
-def download_data_from_url(data_url):
-    response = requests.get(data_url)
-    response.raise_for_status()
-    return response.json()
+    
+def download_data_from_url(data_url, retries=3, delay=5):
+    print(f"Intentando descargar en download_data_from_url: {data_url}")
+    for intento in range(retries):
+        try:
+            response = requests.get(data_url, timeout=30)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Intento {intento+1} fallido por error de red: {e}")
+        except Exception as e:
+            print(f"Intento {intento+1} fallido por error inesperado: {e}")
+        time.sleep(delay)
+    print("Todos los intentos fallaron.")
+    return None
