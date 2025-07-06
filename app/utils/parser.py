@@ -11,11 +11,19 @@ def parser_temp_max(idema_target):
     print(f"Temp. Extr. Estacion: {idema_target} -> data_url: {data_url}", flush=True)
 
     data = download_data_from_url(data_url) # Lista de diccionarios de estaciones meteo
-    idema = data.get("indicativo", "Nan")
-    temMax_lista = data.get("temMax", "Nan")
-    diaMax_lista = data.get("diaMax", "Nan")
-    anioMax_lista = data.get("anioMax", "Nan")
-    mesMax = data.get("mesMax", "Nan")
+    pass
+    if data == "Nan":
+        idema = "Nan"
+        temMax_lista = "Nan"
+        diaMax_lista = "Nan"
+        anioMax_lista = "Nan"
+        mesMax = "Nan"
+    else:
+        idema = data.get("indicativo", "Nan")
+        temMax_lista = data.get("temMax", "Nan")
+        diaMax_lista = data.get("diaMax", "Nan")
+        anioMax_lista = data.get("anioMax", "Nan")
+        mesMax = data.get("mesMax", "Nan")
 
     if isinstance(temMax_lista, list) and temMax_lista:
         temMax = temMax_lista[-1]

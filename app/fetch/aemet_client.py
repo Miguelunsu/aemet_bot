@@ -19,21 +19,48 @@ def get_data_url_from_aemet(endpoint, max_retries=20, delay=5):
         try:
             print(f"Intento {attempts+1}/{max_retries} consultando endpoint")
             response = requests.get(endpoint, headers=headers)
-            response.raise_for_status()
             data = response.json()
-            print(f"Descripción feedback: {data.get('descripcion')}")
-            print(f"Path de datos tiempo real: {data['datos']}")
-            print("Conexión exitosa.")
-            return data['datos']
+            
+            estado = data.get('estado')
+            descripcion = data.get('descripcion')
+            print(f"Estado: {estado}, Descripción: {descripcion}")
+            if estado == 200:
+                # exito
+                print(f"Conexión exitosa. Path de datos tiempo real: {data['datos']}")
+                return data['datos']
+            elif estado == 401:
+                # sin datos
+                print(f"No autorizado ({estado}). Reintento")
+                pass
+            elif estado == 404:
+                # sin datos
+                print(f"Sin datos ({estado}). Se devuelve un Nan")
+                return "Nan"
+            elif estado == 429:
+                # Nos hemos pasado del tiempo. añadimos tiempo
+                print(f"Pasado de tiempo ({estado}). Espera de un minuto. Se añade un intento.")
+                attempts = attempts-1
+                time.sleep(60)
+                continue
+            else:
+                raise ValueError(f"Estado inesperado: {estado}")
         except requests.exceptions.RequestException as e:
-            print(f"Error al conectarse a AEMET: {e}")
-            print(f"Reintentando en {delay} segundos.")
-            time.sleep(delay)
-            attempts += 1
-    raise RuntimeError(f"No se pudo obtener la URL de datos tras {max_retries} intentos.")
+            print(f"Error de red: {e}. Reintentando en {delay} segundos.")
+        except ValueError as e:
+            print(f"Error de lógica: {e}")
+            break
+
+        time.sleep(delay)
+        attempts += 1
+        
+    print(f"No se pudo obtener la URL de datos tras {max_retries} intentos. Devolviendo string NaN")
+    return "Nan"
     
 def download_data_from_url(data_url, retries=3, delay=5):
     print(f"Intentando descargar en download_data_from_url: {data_url}")
+    if data_url == "Nan":
+        print("Devolviendo un Nan en download_data_from_url.")
+        return "Nan"
     for intento in range(retries):
         try:
             response = requests.get(data_url, timeout=30)
@@ -44,5 +71,5 @@ def download_data_from_url(data_url, retries=3, delay=5):
         except Exception as e:
             print(f"Intento {intento+1} fallido por error inesperado: {e}")
         time.sleep(delay)
-    print("Todos los intentos fallaron.")
-    return None
+    print(f"No se pudo obtener la data tras {retries} intentos. Devolviendo string NaN")
+    return "Nan"
