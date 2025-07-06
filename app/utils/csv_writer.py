@@ -1,16 +1,15 @@
 
 import csv
 
-def csv_writer_tmax (idema, temMax, diaMax, mesMax, anioMax, header_bool):
+def csv_writer_tmax (file_name, idema, temMax, diaMax, mesMax, anioMax, header_bool):
     row = [idema, temMax, diaMax, mesMax, anioMax]
-
     if header_bool == True:
-        file = open("test.csv","r+",newline="")
+        file = open(file_name,"r+",newline="")
         file.truncate(0) # Clears file
 
         header = ['idema', 'temMax', 'diaMax', 'mesMax', 'anioMax']
 
-        with open('test.csv', 'w', encoding='UTF8', newline='') as f:
+        with open(file_name, 'w', encoding='UTF8', newline='') as f:
             # create the csv writer
             writer = csv.writer(f)
 
@@ -20,7 +19,7 @@ def csv_writer_tmax (idema, temMax, diaMax, mesMax, anioMax, header_bool):
             # write a row to the csv file
             writer.writerow(row)
     else:
-        with open('test.csv', 'a', encoding='UTF8', newline='') as f:
+        with open(file_name, 'a', encoding='UTF8', newline='') as f:
             # create the csv writer
             writer = csv.writer(f)
 

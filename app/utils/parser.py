@@ -1,18 +1,10 @@
 from fetch.aemet_client import get_data_url_from_aemet, download_data_from_url
 
-def parser_temp_max(idema_target):
-    # Endpoint para valores extremos de temperatura
-    endpoint = f'https://opendata.aemet.es/opendata/api/valores/climatologicos/valoresextremos/parametro/T/estacion/{idema_target}'
-    
-    print(f"Llamando get_data_url_from_aemet (temp. extremas). Estacion: {idema_target}", flush=True)
-
-    data_url = get_data_url_from_aemet(endpoint)
-
-    print(f"Temp. Extr. Estacion: {idema_target} -> data_url: {data_url}", flush=True)
-
-    data = download_data_from_url(data_url) # Lista de diccionarios de estaciones meteo
-    pass
-    if data == "Nan":
+def parser_temp_max(data):
+    # data: Lista de diccionarios de estaciones meteoç
+    # si data es un Nan, devuelve lista de Nans
+    if data == "Nan": 
+        print("Variable data es Nan. Devolviendo lista de Nans.")
         idema = "Nan"
         temMax_lista = "Nan"
         diaMax_lista = "Nan"
