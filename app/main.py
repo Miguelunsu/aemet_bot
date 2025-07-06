@@ -14,40 +14,8 @@ def main():
     try:
         print("Iniciando main.", flush=True)
 
-        endpoint = 'https://opendata.aemet.es/opendata/api/observacion/convencional/todas'
-        print("Llamando get_data_url_from_aemet...", flush=True)
-
-        data_url = get_data_url_from_aemet(endpoint)
-        print(f"data_url: {data_url}", flush=True)
-
-        print("Llamando download_data_from_url...", flush=True)
-        data = download_data_from_url(data_url) # Lista de diccionarios de estaciones meteo
-        print(f"Datos descargados, cantidad: {len(data)}", flush=True)
-        print(f"Tipo de data: {type(data)}")
-
-        print(f"Bucle para enseñar todos los datos:")
-        for i in data:
-            idema = i.get("fint", "Nan")
-            fint = i.get("fint", "Nan")
-            tamax = i.get("ubi", "Nan")
-            ubi = i.get("tamax", "Nan")
-            print(f"Estación {idema}, {fint}, {tamax}, {ubi}")
-
-        ruta_csv_estaciones = os.path.join(BASE_DIR, "estaciones.csv")
-        datos_estaciones = []
-
-        with open(ruta_csv_estaciones, newline='', encoding='utf-8') as csvfile:
-            lector = csv.DictReader(csvfile)
-            for fila in lector:
-                datos_estaciones.append({
-                    'idema': fila['idema'],
-                    'ubi': fila['ubi'],
-                    'lon': float(fila['lon']),
-                    'lat': float(fila['lat'])
-                })
-        
         # Calculo temperaturas extremas
-        if True:
+        if False:
             i_counter = 0
             # Bucle temperaturas extremas
             for i_estacion in datos_estaciones:
@@ -81,6 +49,63 @@ def main():
                 else:
                     # CSV writer sin header
                     csv_writer_tmax(file_name, idema, temMax, diaMax, mesMax, anioMax, False)
+
+        # Obtención de medidas en tiempo real
+        endpoint = 'https://opendata.aemet.es/opendata/api/observacion/convencional/todas'
+        print("Llamando get_data_url_from_aemet...", flush=True)
+
+        data_url = get_data_url_from_aemet(endpoint)
+        print(f"data_url: {data_url}", flush=True)
+
+        print("Llamando download_data_from_url...", flush=True)
+        data = download_data_from_url(data_url) # Lista de diccionarios de estaciones meteo
+        print(f"Datos descargados, cantidad: {len(data)}", flush=True)
+        print(f"Tipo de data: {type(data)}")
+
+        dicc_maximas_temp = dict() # nested diccionary
+        print(f"Bucle para enseñar todos los datos:")
+        for idx, i in enumerate(data, start=1):
+            idema = i.get("idema", "Nan")
+            print(f"{idx}/{len(data)} - {idema}, {i.get('fint')}")
+            if idema == "B614E":
+                pass
+
+            # Si en el diccionario ya hemos visto esta key de idema
+            if idema in dicc_maximas_temp:
+                tmax_dummy = i.get("tamax", "Nan")
+                if dicc_maximas_temp[idema]["tamax"] == "Nan": # la temepratura anterior es NaN
+                    dicc_maximas_temp[idema]["tamax"] == i.get("tamax", "Nan") # Sea lo que sea, se sustituye. En el peor caso, sera un Nan
+                elif tmax_dummy == "Nan": # Si la medida de esta hora es Nan, no se hace nada
+                    pass
+                # Ver si la temperatura dummy es mayor: se sustituye la tmax y el tiempo de medida
+                elif float(tmax_dummy) > float(dicc_maximas_temp[idema]["tamax"]):
+                    dicc_maximas_temp[idema]["fint"] = i.get("fint", "Nan")
+                    dicc_maximas_temp[idema]["tamax"] = i.get("tamax", "Nan")
+            
+            # Si es la primera vez que vemos esta key
+            else:
+                dicc_maximas_temp[idema] = {
+                    "fint": i.get("fint", "Nan"),
+                    "tamax": i.get("tamax", "Nan"),
+                    "ubi": i.get("ubi", "Nan"),
+                    "lat": i.get("lat", "Nan"),
+                    "lon": i.get("lon", "Nan")
+                }
+            # print(f"Estación {idema}, {fint}, {tamax}, {ubi}")
+
+        ruta_csv_estaciones = os.path.join(BASE_DIR, "estaciones.csv")
+        datos_estaciones = []
+
+        with open(ruta_csv_estaciones, newline='', encoding='utf-8') as csvfile:
+            lector = csv.DictReader(csvfile)
+            for fila in lector:
+                datos_estaciones.append({
+                    'idema': fila['idema'],
+                    'ubi': fila['ubi'],
+                    'lon': float(fila['lon']),
+                    'lat': float(fila['lat'])
+                })
+        
 
     except:
         print(f"Error en main", flush=True)
