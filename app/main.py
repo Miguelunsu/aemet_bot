@@ -60,29 +60,32 @@ def main():
         print("Llamando download_data_from_url...", flush=True)
         data = download_data_from_url(data_url) # Lista de diccionarios de estaciones meteo
         print(f"Datos descargados, cantidad: {len(data)}", flush=True)
-        print(f"Tipo de data: {type(data)}")
 
         dicc_maximas_temp = dict() # nested diccionary
-        print(f"Bucle para enseñar todos los datos:")
+        print(f"Bucle de todas las temperaturas:")
         for idx, i in enumerate(data, start=1):
+
             idema = i.get("idema", "Nan")
-            print(f"{idx}/{len(data)} - {idema}, {i.get('fint')}")
-            if idema == "B614E":
+
+            # Debugging
+            if idema == "0016A":
                 pass
 
+            print(f"Estudiando: {idx}/{len(data)} - {idema}, {i.get('fint')}")
             # Si en el diccionario ya hemos visto esta key de idema
             if idema in dicc_maximas_temp:
+
                 tmax_dummy = i.get("tamax", "Nan")
-                if dicc_maximas_temp[idema]["tamax"] == "Nan": # la temepratura anterior es NaN
-                    dicc_maximas_temp[idema]["tamax"] == i.get("tamax", "Nan") # Sea lo que sea, se sustituye. En el peor caso, sera un Nan
-                elif tmax_dummy == "Nan": # Si la medida de esta hora es Nan, no se hace nada
+                if dicc_maximas_temp[idema]["tamax"].lower() == "nan": # si la temepratura presente en el diccionario es NaN...
+                    dicc_maximas_temp[idema]["tamax"] = tmax_dummy # sea lo que sea, se sustituye. En el peor caso, un Nan se sustituye por un nan
+                elif tmax_dummy.lower() == "nan": # Si la medida de esta hora es Nan, no se hace nada
                     pass
                 # Ver si la temperatura dummy es mayor: se sustituye la tmax y el tiempo de medida
                 elif float(tmax_dummy) > float(dicc_maximas_temp[idema]["tamax"]):
                     dicc_maximas_temp[idema]["fint"] = i.get("fint", "Nan")
-                    dicc_maximas_temp[idema]["tamax"] = i.get("tamax", "Nan")
+                    dicc_maximas_temp[idema]["tamax"] = tmax_dummy
             
-            # Si es la primera vez que vemos esta key
+            # Si es la primera vez que vemos esta key, se pone directamente los datos de fint, tamax, ubi lat y lon
             else:
                 dicc_maximas_temp[idema] = {
                     "fint": i.get("fint", "Nan"),
@@ -91,7 +94,80 @@ def main():
                     "lat": i.get("lat", "Nan"),
                     "lon": i.get("lon", "Nan")
                 }
-            # print(f"Estación {idema}, {fint}, {tamax}, {ubi}")
+
+        # Reading a csv from tmax_estaciones_fijadas (maximos de temperaturas de estaciones)
+        ruta_csv_tmax = os.path.join(BASE_DIR, "tmax_estaciones_fijadas.csv")
+        dicc_tmax = {} # diccionario con todas las temperaturas maximas. Contiene idema, temMax, diaMax, mesMax, anioMax
+
+        def string_a_float_con_decimal(s):
+            try:
+                s = str(s).strip()  # por si viene como número o con espacios
+                if len(s) < 2:
+                    return float(s)  # ej: "5" → 5.0
+                return float(s[:-1] + '.' + s[-1])
+            except (ValueError, TypeError):
+                return None  # o lanza una excepción
+
+        with open(ruta_csv_tmax, newline='', encoding='utf-8') as csvfile:
+            lector = csv.DictReader(csvfile)
+            for fila in lector:
+                dicc_tmax[fila['idema']] = {
+                    'temMax': fila['temMax'],
+                    'diaMax': float(fila['diaMax']),
+                    'mesMax': float(fila['mesMax']),
+                    'anioMax': float(fila['anioMax'])
+                    }
+        print("Datos de tem max fetcheados del csv")
+
+        # Crear un nuevo diccionario a partir del viajeo diccionario de estaciones
+        # Este es un scenario que estara lleno de true o falses
+        dicc_extremos_estaciones = dict.fromkeys(dicc_maximas_temp)
+        for key in dicc_maximas_temp.keys():
+            dicc_extremos_estaciones[key] = {
+                "Tmax_superada": False,
+                "Pluvmax_superada": False}
+
+        # Bucle para ver si hay alguna estación en la que se ha superado la tmax
+        print("Bucle para ver si la estacion tiene tmax superada")
+        for idema in dicc_maximas_temp:
+            print(f"evaluando idema para tmax: {idema}")
+            tmax_str = dicc_maximas_temp[idema]["tamax"]
+
+            # Saltar si el valor actual no es válido
+            if not tmax_str or str(tmax_str).lower() == "nan":
+                print(f"⚠️ No se pudo convertir tamax a float para {idema}. Saltando...")
+                continue
+
+            # Comprobamos que no sea un string "NaN"
+            try:
+                tmax = float(tmax_str)
+            except (ValueError, TypeError):
+                print(f"⚠️ Valor inválido de tamax para {idema}: {tmax_str}. Saltando...")
+                continue
+
+            dicc_tmax_info = dicc_tmax.get(idema)
+            if dicc_tmax_info:
+                temMax_abs_str = dicc_tmax_info.get("temMax")
+
+                # Saltar si el valor histórico no es válido
+                if not temMax_abs_str or str(temMax_abs_str).lower() == "nan":
+                    print(f"⚠️ temMax histórica no válida para {idema}: {temMax_abs_str}. Saltando...")
+                    continue
+
+                temMax_abs = string_a_float_con_decimal(temMax_abs_str)
+                
+                if temMax_abs is not None and tmax > temMax_abs:
+                    print(f"✅ T máxima superada en {idema}: actual {tmax} > histórica {temMax_abs}")
+                    dicc_extremos_estaciones[idema]["Tmax_superada"] = True
+            else:
+                print(f"No se encontró una tmax para el idema {idema}")
+
+        
+        print("📈 Estaciones que superaron su T máxima:")
+        for key, valores in dicc_extremos_estaciones.items():
+            if valores.get("Tmax_superada") is True:
+                print(f"- {key}")
+
 
         ruta_csv_estaciones = os.path.join(BASE_DIR, "estaciones.csv")
         datos_estaciones = []
@@ -105,7 +181,6 @@ def main():
                     'lon': float(fila['lon']),
                     'lat': float(fila['lat'])
                 })
-        
 
     except:
         print(f"Error en main", flush=True)
