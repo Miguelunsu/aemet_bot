@@ -59,7 +59,7 @@ def get_data_url_from_aemet(endpoint, max_retries=20, delay=5):
 def download_data_from_url(data_url, retries=3, delay=5):
     print(f"Intentando descargar en download_data_from_url: {data_url}")
     if data_url == "Nan":
-        print("Devolviendo un Nan en download_data_from_url.")
+        print("Devolviendo un string Nan en download_data_from_url.")
         return "Nan"
     for intento in range(retries):
         try:

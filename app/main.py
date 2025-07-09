@@ -2,9 +2,13 @@ import time
 import os
 import sys
 from fetch.aemet_client import get_data_url_from_aemet, download_data_from_url
+from fetch.extreme_values import get_extreme_values
+from fetch.csv_reader import tmax_abs_reader, estacion_reader
+from utils.comparer import abs_12h_comparer_tmax
 from utils.csv_writer import csv_writer_tmax
 from utils.parser import parser_temp_max
-import csv
+from utils.auxiliar import string_a_float_con_decimal
+
 import logging
 
 logging.basicConfig(
@@ -75,132 +79,36 @@ def main():
         print(f"data_url: {data_url}", flush=True)
 
         print("Llamando download_data_from_url...", flush=True)
-        data = download_data_from_url(data_url) # Lista de diccionarios de estaciones meteo
+        data = download_data_from_url(data_url, retries=10) # Lista de diccionarios de estaciones meteo
         print(f"Datos descargados, cantidad: {len(data)}", flush=True)
 
-        # nested diccionary de estaciones con los datos de la temperatura maxima.
-        # Key: idema. Dentro: diccionario con fint, tamax, ubi, lat y lon
-        est_tmax_12h = dict()
-
-        print(f"Bucle de todas las temperaturas:")
-        for idx, est_i in enumerate(data, start=1):
-
-            idema = est_i.get("idema", "Nan")
-            print(f"Estudiando: {idx}/{len(data)} - {idema}, {est_i.get('fint')}")
-
-            # Debugging
-            if idema == "0016A":
-                pass
-
-            # Si en el diccionario ya hemos visto esta key de idema
-            if idema in est_tmax_12h:
-                tmax_dummy = est_i.get("tamax", "Nan")
-
-                if est_tmax_12h[idema]["tamax"] == "Nan": # si la temepratura presente en el diccionario es NaN...
-                    est_tmax_12h[idema]["tamax"] = tmax_dummy # sea lo que sea, se sustituye. En el peor caso, un Nan se sustituye por un nan
-                elif tmax_dummy == "Nan": # Si la medida de esta hora es Nan, no se hace nada
-                    pass
-                # Ver si la temperatura dummy es mayor: se sustituye la tmax y el tiempo de medida
-                elif float(tmax_dummy) > float(est_tmax_12h[idema]["tamax"]):
-                    est_tmax_12h[idema]["fint"] = est_i.get("fint", "Nan")
-                    est_tmax_12h[idema]["tamax"] = tmax_dummy
-            
-            # Si es la primera vez que vemos esta key
-            else:
-                est_tmax_12h[idema] = {
-                    "fint": est_i.get("fint", "Nan"),
-                    "tamax": est_i.get("tamax", "Nan"),
-                    "ubi": est_i.get("ubi", "Nan"),
-                    "lat": est_i.get("lat", "Nan"),
-                    "lon": est_i.get("lon", "Nan")
-                }
+        if isinstance(data, str) and data.lower() == "nan":
+            raise ValueError("La variable es el string 'Nan'. No se ha podido conectar.")
+        
+        # Variable est_tmax_12h: Nested diccionary de estaciones con los datos de la temperatura maxima.
+        est_tmax_12h = get_extreme_values(data, meteo_var="tamax")
+        logging.info(f"Valores extremos obtenidos. Keys de est_tmax_12h: {list(est_tmax_12h.keys())}")
 
         # Reading a csv from tmax_estaciones_fijadas (maximos de temperaturas de estaciones)
         ruta_csv_tmax = os.path.join(BASE_DIR, "tmax_estaciones_fijadas.csv")
-        est_tmax_abs = {} # diccionario con todas las temperaturas maximas. Contiene idema, temMax, diaMax, mesMax, anioMax
+        
+        # est_tmax_abs: diccionario con todas las temperaturas maximas.
+        # Contiene idema, temMax, diaMax, mesMax, anioMax
+        est_tmax_abs = tmax_abs_reader(ruta_csv_tmax)
 
-        def string_a_float_con_decimal(s):
-            try:
-                s = str(s).strip()  # por si viene como número o con espacios
-                if len(s) < 2:
-                    return float(s)  # ej: "5" → 5.0
-                return float(s[:-1] + '.' + s[-1])
-            except (ValueError, TypeError):
-                return None  # o lanza una excepción
+        # para debugging y ver que los valores extremos se estan haciendo bien
+        est_tmax_12h["0076"]["tamax"] = 77.7
 
-        with open(ruta_csv_tmax, newline='', encoding='utf-8') as csvfile:
-            lector = csv.DictReader(csvfile)
-            for fila in lector:
-                est_tmax_abs[fila['idema']] = {
-                    'temMax': fila['temMax'],
-                    'diaMax': float(fila['diaMax']),
-                    'mesMax': float(fila['mesMax']),
-                    'anioMax': float(fila['anioMax'])
-                    }
-        print("Datos de tem max fetcheados del csv")
-
-        # Crear un nested diccionario de bools a partir del viajeo diccionario de estaciones
-        bool_est_extrem_12h = dict.fromkeys(est_tmax_12h)
-        for key in est_tmax_12h.keys():
-            bool_est_extrem_12h[key] = {
-                "Tmax_superada": False,
-                "Pluvmax_superada": False}
-
-        # Bucle para ver si hay alguna estación en la que se ha superado la tmax
-        print("Bucle para ver si la estacion tiene tmax superada")
-        for idema in est_tmax_12h:
-            print(f"evaluando idema para tmax: {idema}")
-            tmax_str = est_tmax_12h[idema]["tamax"]
-
-            # Saltar si el valor actual no es válido
-            if not tmax_str or str(tmax_str).lower() == "nan":
-                print(f"⚠️ No se pudo convertir tamax a float para {idema}. Saltando...")
-                continue
-
-            # Comprobamos que no sea un string "NaN"
-            try:
-                tmax = float(tmax_str)
-            except (ValueError, TypeError):
-                print(f"⚠️ Valor inválido de tamax para {idema}: {tmax_str}. Saltando...")
-                continue
-
-            est_tmax_abs_info = est_tmax_abs.get(idema)
-            if est_tmax_abs_info:
-                temMax_abs_str = est_tmax_abs_info.get("temMax")
-
-                # Saltar si el valor histórico no es válido
-                if not temMax_abs_str or str(temMax_abs_str).lower() == "nan":
-                    print(f"⚠️ temMax histórica no válida para {idema}: {temMax_abs_str}. Saltando...")
-                    continue
-
-                temMax_abs = string_a_float_con_decimal(temMax_abs_str)
-                
-                if temMax_abs is not None and tmax > temMax_abs:
-                    print(f"✅ T máxima superada en {idema}: actual {tmax} > histórica {temMax_abs}")
-                    bool_est_extrem_12h[idema]["Tmax_superada"] = True
-            else:
-                print(f"No se encontró una tmax para el idema {idema}")
-
+        bool_est_extrem_12h = abs_12h_comparer_tmax(est_tmax_12h, est_tmax_abs)
         
         print("📈 Estaciones que superaron su T máxima:")
         for key, valores in bool_est_extrem_12h.items():
             if valores.get("Tmax_superada") is True:
                 print(f"- {key}")
 
+        # Leyendo datos de todas las estaciones
         ruta_csv_estaciones = os.path.join(BASE_DIR, "estaciones.csv")
-        datos_estaciones = []
-
-        with open(ruta_csv_estaciones, newline='', encoding='utf-8') as csvfile:
-            lector = csv.DictReader(csvfile)
-            for fila in lector:
-                datos_estaciones.append({
-                    'idema': fila['idema'],
-                    'ubi': fila['ubi'],
-                    'lon': float(fila['lon']),
-                    'lat': float(fila['lat'])
-                })
-
-    
+        datos_estaciones = estacion_reader(ruta_csv_estaciones)
 
     except:
         print(f"Error en main", flush=True)
