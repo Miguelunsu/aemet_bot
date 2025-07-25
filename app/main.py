@@ -21,11 +21,11 @@ logging.basicConfig(
     ]
 )
 
-logging.debug("Mensaje de debug")
-logging.info("Mensaje informativo")
-logging.warning("Advertencia")
-logging.error("Error")
-logging.critical("Error crítico")
+#logging.debug("Mensaje de debug")
+#logging.info("Mensaje informativo")
+#logging.warning("Advertencia")
+#logging.error("Error")
+#logging.critical("Error crítico")
 
 def main():
     print(f"Python version: {sys.version}")
@@ -36,14 +36,19 @@ def main():
         print("Iniciando main.", flush=True)
 
         # Calculo temperaturas extremas
-        if False:
+        if True:
+            
+            # Leyendo datos de todas las estaciones
+            ruta_csv_estaciones = os.path.join(BASE_DIR, "estaciones.csv")
+            datos_estaciones = estacion_reader(ruta_csv_estaciones)
+
             i_counter = 0
             # Bucle temperaturas extremas
             for i_estacion in datos_estaciones:
                 i_counter = i_counter + 1
                 i_idema = i_estacion.get("idema")
 
-                print(f"Estudiando Tmax en station: {idema}. Station {i_counter}/{len(datos_estaciones)}")
+                print(f"Estudiando Tmax en station: {i_idema}. Station {i_counter}/{len(datos_estaciones)}")
                 print("Time sleep: 10")
                 time.sleep(10)
 
@@ -66,10 +71,10 @@ def main():
                 file_name = os.path.join(BASE_DIR, "tmax_estaciones.csv")
                 if i_counter == 1:
                     # CSV writer con header
-                    csv_writer_tmax(file_name, idema, temMax, diaMax, mesMax, anioMax, True)
+                    csv_writer_tmax(file_name, i_idema, temMax, diaMax, mesMax, anioMax, True)
                 else:
                     # CSV writer sin header
-                    csv_writer_tmax(file_name, idema, temMax, diaMax, mesMax, anioMax, False)
+                    csv_writer_tmax(file_name, i_idema, temMax, diaMax, mesMax, anioMax, False)
 
         # Obtención de medidas en tiempo real
         endpoint = 'https://opendata.aemet.es/opendata/api/observacion/convencional/todas'
@@ -106,9 +111,6 @@ def main():
             if valores.get("Tmax_superada") is True:
                 print(f"- {key}")
 
-        # Leyendo datos de todas las estaciones
-        ruta_csv_estaciones = os.path.join(BASE_DIR, "estaciones.csv")
-        datos_estaciones = estacion_reader(ruta_csv_estaciones)
 
     except:
         print(f"Error en main", flush=True)

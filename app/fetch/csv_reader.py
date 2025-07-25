@@ -28,3 +28,4 @@ def estacion_reader(ruta_csv_estaciones):
                 'lon': float(fila['lon']),
                 'lat': float(fila['lat'])
             })
+    return datos_estaciones
