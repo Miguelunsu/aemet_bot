@@ -5,8 +5,8 @@ from fetch.aemet_client import get_data_url_from_aemet, download_data_from_url
 from fetch.extreme_values import get_extreme_values
 from fetch.csv_reader import tmax_abs_reader, estacion_reader
 from utils.comparer import abs_12h_comparer_tmax
-from utils.csv_writer import csv_writer_tmax
-from utils.parser import parser_temp_max
+from utils.csv_writer import csv_writer_tmax, csv_writer_tmax_todos_meses
+from utils.parser import parser_temp_max, parser_temp_max_todos_meses
 from utils.auxiliar import string_a_float_con_decimal
 
 import logging
@@ -60,6 +60,24 @@ def main():
                 data = download_data_from_url(data_url) # Lista de diccionarios de estaciones meteo
 
                 dicc_estacion_tmax = parser_temp_max(data)
+                dicc_estacion_tmax2 = parser_temp_max_todos_meses(data)
+                """
+                dicc_estacion_tmax2
+                Diccionario con la siguiente estructura:
+                {
+                    "idema": str,
+                    "ene_temp": str, "ene_dia": str, "ene_anio": str,
+                    "feb_temp": ..., "feb_dia": ..., "feb_anio": ...,
+                    ...
+                    "dic_temp": ..., "dic_dia": ..., "dic_anio": ...
+                }
+                """
+                file_name = os.path.join(BASE_DIR, "tmax_estaciones_test.csv")
+                if i_counter == 1: # Primera vez escribiendo en el csv, necesario header
+                    csv_writer_tmax_todos_meses (file_name, dicc_estacion_tmax2 ,header_bool = True)
+                else:
+                    # CSV writer sin header
+                    csv_writer_tmax_todos_meses(file_name, dicc_estacion_tmax2, header_bool = False)
 
                 temMax = dicc_estacion_tmax.get("temMax")
                 diaMax = dicc_estacion_tmax.get("diaMax")
