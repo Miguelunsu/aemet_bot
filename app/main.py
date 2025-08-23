@@ -28,12 +28,12 @@ logging.basicConfig(
 #logging.critical("Error crítico")
 
 def main():
-    print(f"Python version: {sys.version}")
+    logging.info(f"Python version: {sys.version}")
     
     # Ruta al archivo CSV relativa al archivo actual. Usado para csv's.
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     try:
-        print("Iniciando main.", flush=True)
+        logging.info("Iniciando main.")
 
         # Calculo temperaturas extremas
         if True:
@@ -48,17 +48,15 @@ def main():
                 i_counter = i_counter + 1
                 i_idema = i_estacion.get("idema")
 
-                print(f"Estudiando Tmax en station: {i_idema}. Station {i_counter}/{len(datos_estaciones)}")
-                print("Time sleep: 10")
+                logging.info(f"Estudiando Tmax en station: {i_idema}. Station {i_counter}/{len(datos_estaciones)}")
+                logging.info("Time sleep: 10")
                 time.sleep(10)
 
                 # Endpoint para valores extremos de temperatura
                 endpoint = f'https://opendata.aemet.es/opendata/api/valores/climatologicos/valoresextremos/parametro/T/estacion/{i_idema}'
-                
-                print(f"Llamando get_data_url_from_aemet (tempext). Estacion: {i_idema}", flush=True)
                 data_url = get_data_url_from_aemet(endpoint)
 
-                print(f"Estacion: {i_idema} -> data_url tempext: {data_url}", flush=True)
+                logging.info(f"Estacion: {i_idema} -> data_url tempext: {data_url}")
                 data = download_data_from_url(data_url) # Lista de diccionarios de estaciones meteo
 
                 dicc_estacion_tmax = parser_temp_max(data)
@@ -77,13 +75,12 @@ def main():
                     csv_writer_tmax(file_name, i_idema, temMax, diaMax, mesMax, anioMax, False)
 
         # Obtención de medidas en tiempo real
+        logging.info("Iniciando medidas en tiempo real")
+
         endpoint = 'https://opendata.aemet.es/opendata/api/observacion/convencional/todas'
-        print("Llamando get_data_url_from_aemet...", flush=True)
 
         data_url = get_data_url_from_aemet(endpoint)
-        print(f"data_url: {data_url}", flush=True)
 
-        print("Llamando download_data_from_url...", flush=True)
         data = download_data_from_url(data_url, retries=10) # Lista de diccionarios de estaciones meteo
         print(f"Datos descargados, cantidad: {len(data)}", flush=True)
 
