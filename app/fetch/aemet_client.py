@@ -60,7 +60,7 @@ def get_data_url_from_aemet(endpoint, max_retries=20, delay=5):
     print(f"No se pudo obtener la URL de datos tras {max_retries} intentos. Devolviendo string NaN")
     return "Nan"
     
-def download_data_from_url(data_url, retries=3, delay=5):
+def download_data_from_url(data_url, retries=10, delay=5):
     logging.info(f"Iniciando download_data_from_url. Data url: {data_url}")
     if data_url == "Nan":
         logging.info("Input: string Nan. Devolviendo un string Nan en download_data_from_url.")

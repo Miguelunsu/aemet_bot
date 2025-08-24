@@ -27,7 +27,12 @@ def csv_writer_tmax (file_name, idema, temMax, diaMax, mesMax, anioMax, header_b
     return
 
 
-def csv_writer_tmax_todos_meses (file_name, dicc_estacion_tmax2, header_bool):
+def csv_writer_tmax_todos_meses (file_name, i_idema, dicc_estacion_tmax2, header_bool):
+    
+    # En caso de que el dicc tenga un idema NAN, lo cambiamos por el idema del bucle de main
+    if dicc_estacion_tmax2["idema"] == "Nan":
+        dicc_estacion_tmax2["idema"] = i_idema
+        
     if header_bool == True:
         file = open(file_name,"r+",newline="")
         file.truncate(0) # Clears file
