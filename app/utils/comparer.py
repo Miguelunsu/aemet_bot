@@ -1,5 +1,5 @@
 from utils.auxiliar import string_a_float_con_decimal
-
+import logging
 def abs_12h_comparer_tmax(est_tmax_12h, est_tmax_abs):
     # Compara el diccionario de 12h y abs para ver si se supera la tmax
     # est_tmax_12h: diccionario con las temperaturas maximas en las ultimas 12 horas
@@ -71,9 +71,9 @@ def abs_12h_comparer_tmax(est_tmax_12h, est_tmax_abs):
 
 
 def abs_12h_comparer_tmax_test(est_tmax_12h, est_tmax_abs):
-    # Compara el diccionario de 12h y abs para ver si se supera la tmax
+    # Compara el diccionario de 12h y abs para ver si se supera la temp. maxima
     # est_tmax_12h: diccionario con las temperaturas maximas en las ultimas 12 horas
-    # est_tmax_abs: diccionario con las temperaturas maximas históricas
+    # est_tmax_abs: diccionario con las temperaturas maximas históricas de ese mes
     
     print("Funcion abs_12h_comparer iniciada")
 
@@ -86,21 +86,21 @@ def abs_12h_comparer_tmax_test(est_tmax_12h, est_tmax_abs):
 
     # Bucle para ver si hay alguna estación en la que se ha superado la tmax
     for idema in est_tmax_12h:
-        print(f"Evaluando idema para tmax: {idema}")
+        logging.info(f"Evaluando si la temp de {idema} es la maxima del mes...")
         
         # Extrayendo el string de tmax de 12h AQUI EL tmax_str ES UN FLOAT, SE PUEDE CAMBIAR (EJEPLO 31.1)
-        tmax_str = est_tmax_12h[idema]["tamax"]
+        tamax_float = est_tmax_12h[idema]["tamax"]
 
         # Saltar si el valor actual no es válido
-        if not tmax_str or str(tmax_str).lower() == "nan":
-            print(f"⚠️ No se pudo convertir tamax a float para {idema}. Saltando...")
+        if not tamax_float or str(tamax_float).lower() == "nan":
+            logging.warning(f"No se pudo convertir tamax a float para {idema}. Saltando...")
             continue
 
         # Comprobamos que no sea un string "NaN"
         try:
-            tmax = float(tmax_str)
+            tamax_float = float(tamax_float)
         except (ValueError, TypeError):
-            print(f"⚠️ Valor inválido de tamax para {idema}: {tmax_str}. Saltando...")
+            logging.warning(f"Valor inválido de tamax para {idema}: {tamax_float}. Saltando...")
             continue
 
         # Usamos .get(idema) para obtener el valor asociado a la clave 'idema' en est_tmax_abs
@@ -120,13 +120,13 @@ def abs_12h_comparer_tmax_test(est_tmax_12h, est_tmax_abs):
             # Esperamos un diccionario. Si no hay valor o es explícitamente un string "nan" → se ignora
             # Esta línea descarta valores vacíos, None, "", "nan", "NaN", etc.
             if not temMax_abs or (isinstance(temMax_abs, str) and temMax_abs.lower() == "nan"):
-                print(f"⚠️ temMax histórica no válida para {idema}: {temMax_abs}. Saltando...")
+                logging.warning(f"⚠️ temMax histórica no válida para {idema}: {temMax_abs}. Saltando...")
                 continue
             
-            if temMax_abs is not None and tmax > temMax_abs:
-                print(f"✅ T máxima superada en {idema}: actual {tmax} > histórica del mes {temMax_abs}")
+            if temMax_abs is not None and tamax_float > temMax_abs:
+                logging.info(f"✅ T máxima superada en {idema}: actual {tamax_float} > histórica del mes {temMax_abs}")
                 bool_est_extrem_12h[idema]["Tmax_superada"] = True
         else:
-            print(f"No se encontró una tmax para el idema {idema}")
+            logging.warning(f"No se encontró una tmax para el idema {idema}")
     
     return bool_est_extrem_12h

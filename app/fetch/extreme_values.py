@@ -1,18 +1,19 @@
+import logging
 
 def get_extreme_values(data, meteo_var):
     # data: diccionario que tiene todas las medidas en tiempo real (una por hora)
     # meteo_var: variable meteo de la que queremos los datos extremos por estacion
     
     # Devuelve: variable est_extreme_12h: Nested diccionary de estaciones con los datos de variable max.
-    # Key: idema. Dentro: diccionario con fint, tamax, ubi, lat y lon
+    # Key: idema. Dentro: diccionario con fint (hora), tamax, ubi, lat y lon
     
     est_extreme_12h = dict()
     
-    print(f"Funcion get_extreme_values. Getting: {meteo_var}")
+    logging.info(f"Funcion get_extreme_values. Getting: {meteo_var}")
     for idx, est_i in enumerate(data, start=1):
 
         idema = est_i.get("idema", "Nan")
-        print(f"Estudiando {meteo_var}: {idx}/{len(data)} - {idema}, {est_i.get('fint')}")
+        logging.info(f"Estudiando {meteo_var}: {idx}/{len(data)} - {idema}, {est_i.get('fint')}")
 
         # Si en el diccionario ya hemos visto esta key de idema
         if idema in est_extreme_12h:

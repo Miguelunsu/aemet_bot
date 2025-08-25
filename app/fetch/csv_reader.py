@@ -33,7 +33,25 @@ def estacion_reader(ruta_csv_estaciones):
     return datos_estaciones
 
 def tmax_reader_todays_month(ruta_tmax_abs_csv, mes_actual_str_number):
-    print(f"Leyendo las tmax abs del mes {mes_actual_str_number}. Origen csv {ruta_tmax_abs_csv}")
+    """
+    Lee las temperaturas máximas absolutas del mes actual desde un archivo CSV.
+    
+    Args:
+        ruta_tmax_abs_csv (str): Ruta del archivo CSV con los datos de temperaturas
+        mes_actual_str_number (str): Número del mes en formato '01' a '12'
+    
+    Returns:
+        est_tmax_abs: Diccionario con las temperaturas máximas por estación (idema).
+                      Cada entrada contiene temperatura, día y año del récord mensual.
+                      Los valores inválidos se retornan como None.
+    
+    Example:
+        >>> datos = tmax_reader_todays_month('temperaturas.csv', '07')
+        >>> print(datos['1234X'])
+        {'mes_target_temMax': 35.6, 'mes_target_diaMax': 15, 'mes_target_anioMax': 2022}
+    """
+
+    # Leyendo el mes en str
     
     mes_corresp = {
         "01": "ene",
@@ -53,7 +71,7 @@ def tmax_reader_todays_month(ruta_tmax_abs_csv, mes_actual_str_number):
     mes_actual_str_letras = mes_corresp[mes_actual_str_number]
 
     est_tmax_abs = {}
-    # diccionario con todas las temperaturas maximas
+    # est_tmax_abs: diccionario con todas las temperaturas maximas. Tiene como keys: mes_target_temMax, mes_target_diaMax, mes_target_anioMax
 
     with open(ruta_tmax_abs_csv, newline='', encoding='utf-8') as csvfile:
         lector = csv.DictReader(csvfile)          
