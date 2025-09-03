@@ -1,0 +1,159 @@
+{
+  "indicativo" : "3100B",
+  "nombre" : "ARANJUEZ",
+  "ubicacion" : "MADRID",
+  "codigo" : "033100",
+  "maxDiasMesPrec" : [ "13", "12", "9", "12", "17", "17", "5", "3", "6", "17", "11", "14", "17" ],
+  "anioMaxDiasMesPrec" : [ "1988", "1986", "1984", "1988", "1984", "1988", "1979", "1983", "1982", "1979", "1988", "1987", "1979" ],
+  "mesMaxDiasMesPrec" : "10",
+  "maxDiasMesNieve" : [ "1", "1", "2", "0", "0", "0", "0", "0", "0", "0", "0", "0", "2" ],
+  "anioMaxDiasMesNieve" : [ "1985", "1986", "1984", "1988", "1988", "1988", "1988", "1988", "1988", "1988", "1988", "1988", "1984" ],
+  "mesMaxDiasMesNieve" : "3",
+  "maxDiasMesTormenta" : [ "0", "1", "0", "0", "0", "0", "0", "9", "1", "0", "0", "0", "9" ],
+  "anioMaxDiasMesTormenta" : [ "1988", "1982", "1988", "1988", "1988", "1988", "1988", "1976", "1983", "1988", "1988", "1988", "1976" ],
+  "mesMaxDiasMesTormenta" : "8",
+  "precMaxDia" : [ "370", "253", "308", "380", "286", "340", "307", "400", "615", "596", "482", "340", "615" ],
+  "diaMaxDia" : [ "9", "15", "5", "16", "24", "2", "6", "10", "2", "19", "30", "28", "2" ],
+  "anioMaxDia" : [ "1987", "2010", "2010", "1977", "2018", "1982", "2017", "2009", "2023", "2023", "2023", "1981", "2023" ],
+  "mesMaxDia" : "9",
+  "precMaxMen" : [ "924", "724", "1287", "976", "908", "725", "719", "870", "963", "1326", "975", "1086", "1326" ],
+  "anioMaxMen" : [ "1979", "2010", "2024", "2016", "2008", "1988", "1976", "1976", "2023", "2008", "2014", "2022", "2008" ],
+  "mesMaxMen" : "10",
+  "precMinMen" : [ "0", "0", "4", "0", "5", "0", "0", "0", "0", "0", "0", "0", "0" ],
+  "anioMinMes" : [ "1983", "2023", "1988", "1982", "2019", "1987", "2023", "2004", "2017", "1985", "1998", "1988", "1988" ],
+  "mesMinMen" : "12"
+}
+
+Metadatos:
+{
+        "unidad_generadora": "Servicio del Banco Nacional de Datos Climatológicos",
+        "periodicidad": "1 vez al día",
+        "descripcion": "Extremos registrados. Precipitación",
+        "formato": "json/xml",
+        "copyright": "© AEMET. Autorizado el uso de la información y su reproducción citando a AEMET como autora de la misma.",
+        "notaLegal": "https://www.aemet.es/es/nota_legal",
+        "campos": [{
+                        "id": "indicativo",
+                        "descripcion": "Indicativo de la estación",
+                        "tipo_datos": "string",
+                        "requerido": true
+                },{
+                        "id": "nombre",
+                        "descripcion": "Nombre de la estación",
+                        "tipo_datos": "string",
+                        "requerido": true
+                },{
+                         "id": "ubicacion",
+                        "descripcion": "Ubicación de la estación",
+                        "tipo_datos": "string",
+                        "requerido": true
+                },{
+
+                        "id": "codigo",
+                        "descripcion": "Código de la variable",
+                        "tipo_datos": "string",
+                        "requerido": true
+                },{
+                        "id": "maxdíasMesPrec",
+                        "descripcion": "Máximo nº de días con meteoro lluvia. Contiene 13 campos correspondientes a los 12 meses del año y el último a la máxima absoluto",
+                        "tipo_datos": "array de string",
+                        "requerido": true
+                },{
+                        "id": "anioMaxdíasMesPrec",
+                        "descripcion": "Año en que se dio el Máximo nº de días con meteoro lluvia. Contiene 13 campos correspondientes a los 12 meses del año y el último al año del máximo absoluto",
+                        "tipo_datos": "array de string",
+                        "requerido": true
+                },{
+                        "id": "mesMaxdíasMesPrec",
+                        "descripcion": "Mes en que se dio el Máximo nº de días con meteoro lluvia",
+                        "tipo_datos": "string",
+                        "requerido": true
+                },{
+                        "id": "maxdíasMesNieve",
+                        "descripcion": "Máximo nº de días con meteoro nieve. Contiene 13 campos correspondientes a los 12 meses del año y el último a la máxima absoluto",
+                        "tipo_datos": "array de string",
+                        "requerido": true
+                },{
+                        "id": "anioMaxdíasMesNieve",
+                        "descripcion": "Año en que se dio el Máximo nº de días con meteoro nieve. Contiene 13 campos correspondientes a los 12 meses del año y el último al año del máximo absoluto",
+                        "tipo_datos": "array de string",
+                        "requerido": true
+                },{
+                        "id": "mesMaxdíasMesNieve",
+                        "descripcion": "Mes en que se dio el Máximo nº de días con meteoro nieve",
+                        "tipo_datos": "string",
+                        "requerido": true
+                },{
+                        "id": "maxdíasMesTormenta",
+                        "descripcion": "Máximo nº de días de tormenta. Contiene 13 campos correspondientes a los 12 meses del año y el último a la máxima absoluto",
+                        "tipo_datos": "array de string",
+                        "requerido": true
+                },{
+                        "id": "anioMaxdíasMesTormenta",
+                        "descripcion": "Año en que se dio el Máximo nº de días con meteoro tormenta. Contiene 13 campos correspondientes a los 12 meses del año y el último al año del máximo absoluto",
+                        "tipo_datos": "array de string",
+                        "requerido": true
+                },{
+                        "id": "mesMaxdíasMesTormenta",
+                        "descripcion": "Mes en que se dio el Máximo nº de días con meteoro tormenta",
+                        "tipo_datos": "string",
+                        "requerido": true
+                 },{
+                        "id": "precMaxDia",
+                        "descripcion": "Precipitación máxima diaria. Contiene 13 campos correspondientes a los 12 meses del año y el último a la máxima absoluto",
+                        "tipo_datos": "array de string",
+			"unidad": "décimas de mm (Ip = inferior a 0,1 mm)",
+                        "requerido": true
+                },{
+                        "id": "diaMaxDia",
+                        "descripcion": "Día en que se dio la precipitación máxima diaria. Contiene 13 campos correspondientes a los 12 meses del año y el último al año del máximo absoluto",
+                        "tipo_datos": "array de string",
+                        "requerido": true
+                },{
+                        "id": "anioMaxDia",
+                        "descripcion": "Año en que se dio la precipitación máxima diaria. Contiene 13 campos correspondientes a los 12 meses del año y el último al año del máximo absoluto",
+                        "tipo_datos": "array de string",
+                        "requerido": true
+                },{
+                        "id": "mesMaxMed",
+                        "descripcion": "Mes en que se dio la precipitación máxima mensual",
+                        "tipo_datos": "string",
+                        "requerido": true
+
+                },{
+                        "id": "precMaxMen",
+                        "descripcion": "Precipitación máxima mensual. Contiene 13 campos correspondientes a los 12 meses del año y el último a la máxima absoluto",
+                        "tipo_datos": "array de string",
+			"unidad": "décimas de mm (Ip = inferior a 0,1 mm)",
+                        "requerido": true
+                },{
+                        "id": "anioMaxMen",
+                        "descripcion": "Año en que se dio la precipitación máxima mensual. Contiene 13 campos correspondientes a los 12 meses del año y el último al año del máximo absoluto",
+                        "tipo_datos": "array de string",
+                        "requerido": true
+                },{
+                        "id": "mesMaxMed",
+                        "descripcion": "Mes en que se dio la precipitación máxima mensual",
+                        "tipo_datos": "string",
+                        "requerido": true
+
+                 },{
+                        "id": "precMinMen",
+                        "descripcion": "Precipitación mínima mensual. Contiene 13 campos correspondientes a los 12 meses del año y el último a la máxima absoluto",
+                        "tipo_datos": "array de string",
+			"unidad": "décimas de mm (Ip = inferior a 0,1 mm)",
+                        "requerido": true
+                },{
+                        "id": "anioMinMen",
+                        "descripcion": "Año en que se dio la precipitación mínima mensual. Contiene 13 campos correspondientes a los 12 meses del año y el último al año del máximo absoluto",
+                        "tipo_datos": "array de string",
+                        "requerido": true
+                },{
+                        "id": "mesMinMed",
+                        "descripcion": "Mes en que se dio la precipitación mínima mensual",
+                        "tipo_datos": "string",
+                        "requerido": true
+
+}
+
+]}
