@@ -4,9 +4,9 @@ import sys
 from fetch.aemet_client import get_data_url_from_aemet, download_data_from_url
 from fetch.extreme_values import get_extreme_values
 from fetch.csv_reader import estacion_reader, tmax_reader_todays_month
-from utils.comparer import abs_12h_comparer_tmax, abs_12h_comparer_tmax_test
-from utils.csv_writer import csv_writer_tmax, csv_writer_tmax_todos_meses
-from utils.parser import parser_temp_max, parser_temp_max_todos_meses
+from utils.comparer import abs_12h_comparer_tmax
+from utils.csv_writer import csv_writer_tmax_todos_meses
+from utils.parser import parser_temp_max_todos_meses
 from datetime import date
 
 import logging
@@ -114,13 +114,24 @@ def main():
         est_tmax_12h["0009X"]["tamax"] = 88.8
         
         # bool_est_extrem_12h = abs_12h_comparer_tmax(est_tmax_12h, est_tmax_abs)
-        bool_est_tmax_12h_superada = abs_12h_comparer_tmax_test(est_tmax_12h, dic_est_tmax_mes)
-
+        bool_est_tmax_12h_superada = abs_12h_comparer_tmax(est_tmax_12h, dic_est_tmax_mes)
+    
+        # keys que contienen los idemas que superaron la T max
+        idemas_tmax_mes_superada = []
         print("Estaciones que superaron su T máxima:")
-        for key, valores in bool_est_tmax_12h_superada.items():
-            if valores.get("Tmax_superada") is True:
-                print(f"- {key}")
+        for key, valores in bool_est_tmax_12h_superada[0].items():
+            if valores.get("Tmax_superada_mes") is True:
+                print(f"Superada para el mes: {key}.")
+                idemas_tmax_mes_superada.append(key)
+                if valores.get("Tmax_superada_abs") is True:
+                    print(f"!!! Superada de manera absoluta: {key}")
+                    print(f"Info del día de hoy{est_tmax_12h[key]}.")
+                    print(f"Info del día histórico{bool_est_tmax_12h_superada[1][key]}.")
+                else:
+                    print(f"Info del día de hoy{est_tmax_12h[key]}.")
+                    print(f"Info del día histórico{bool_est_tmax_12h_superada[1][key]}.")
 
+        print("Acabando programa")
 
     except:
         print(f"Error en main", flush=True)
