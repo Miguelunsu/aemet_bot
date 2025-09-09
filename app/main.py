@@ -121,15 +121,15 @@ def main():
         print("Estaciones que superaron su T máxima:")
         for key, valores in bool_est_tmax_12h_superada[0].items():
             if valores.get("Tmax_superada_mes") is True:
-                print(f"Superada para el mes: {key}.")
+                print(f"-> Superada para la estacion: {key}.")
                 idemas_tmax_mes_superada.append(key)
                 if valores.get("Tmax_superada_abs") is True:
                     print(f"!!! Superada de manera absoluta: {key}")
-                    print(f"Info del día de hoy{est_tmax_12h[key]}.")
-                    print(f"Info del día histórico{bool_est_tmax_12h_superada[1][key]}.")
+                    print(f"    Info del día de hoy{est_tmax_12h[key]}.")
+                    print(f"    Info del día histórico{bool_est_tmax_12h_superada[1][key]}.")
                 else:
-                    print(f"Info del día de hoy{est_tmax_12h[key]}.")
-                    print(f"Info del día histórico{bool_est_tmax_12h_superada[1][key]}.")
+                    print(f"    Info del día de hoy{est_tmax_12h[key]}.")
+                    print(f"    Info del día histórico{bool_est_tmax_12h_superada[1][key]}.")
 
         print("Acabando programa")
 
