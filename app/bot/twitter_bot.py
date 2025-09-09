@@ -36,11 +36,3 @@ def post_tweet(tweet_text: str):
     """
     response = client.create_tweet(text=tweet_text)    # Llama al endpoint POST /2/tweets
     print("✅ Tweet publicado con ID:", response.data["id"])  # Muestra en consola el ID del tweet
-
-# -------------------------------
-# Bloque principal
-# -------------------------------
-# Se ejecuta solo si corremos este script directamente
-# Permite que el código también sea importado como módulo
-if __name__ == "__main__":
-    post_tweet("🚀 Bot funcionando con Tweepy Client y OAuth1 user context")

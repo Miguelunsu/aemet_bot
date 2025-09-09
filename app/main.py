@@ -8,6 +8,8 @@ from utils.comparer import abs_12h_comparer_tmax
 from utils.csv_writer import csv_writer_tmax_todos_meses
 from utils.parser import parser_temp_max_todos_meses
 from datetime import date
+import datetime
+from bot.twitter_bot import post_tweet 
 
 import logging
 
@@ -132,6 +134,23 @@ def main():
                     print(f"    Info del día histórico{bool_est_tmax_12h_superada[1][key]}.")
 
         print("Acabando programa")
+
+        # Twittear
+        # post_tweet("Bot funcionando con Tweepy Client y OAuth1 user context")
+        # Marcar el periodo de refresco del cálculo de variables
+        # periodo_horas = 12
+        # periodo_segundos = periodo_horas*3600
+        periodo_segundos = 10
+
+        while True:
+            # Cálculo de la hora actual
+            current_time = datetime.datetime.now()
+            logging.info(f"[{current_time.strftime('%Y-%m-%d %H:%M:%S')}] hey")
+
+            # Ejecutar acción periódica
+
+            # Esperar hasta el próximo intervalo
+            time.sleep(periodo_segundos)
 
     except:
         print(f"Error en main", flush=True)
