@@ -7,38 +7,26 @@ from fetch.csv_reader import estacion_reader, tmax_reader_todays_month
 from utils.comparer import abs_12h_comparer_tmax
 from utils.csv_writer import csv_writer_tmax_todos_meses
 from utils.parser import parser_temp_max_todos_meses
+from utils.logger import configurar_logging
 from datetime import date
 import datetime
-from bot.twitter_bot import post_tweet 
-
+from bot.twitter_bot import post_tweet
 import logging
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='[%(asctime)s] %(levelname)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    handlers=[
-        logging.FileHandler("miapp.log", encoding='utf-8'),
-        logging.StreamHandler()
-    ]
-)
-
-# EJEMPLOS DE LOGS
-#logging.debug("Mensaje de debug")
-#logging.info("Mensaje informativo")
-#logging.warning("Advertencia")
-#logging.error("Error")
-#logging.critical("Error crítico")
-
 def main():
+    # Configurar logs
+    configurar_logging()
+    
     logging.info(f"Python version: {sys.version}")
     
     # Ruta al archivo CSV relativa al archivo actual. Usado para csv's.
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    
+    # try que encapsula todo el programa
     try:
         logging.info("Iniciando main.")
 
-        # Calculo temperaturas extremas
+        # Lectura temperaturas extremas
         if False:
             
             # Leyendo datos de todas las estaciones
@@ -112,7 +100,7 @@ def main():
         # Los valores inválidos se retornan como None.
         dic_est_tmax_mes = tmax_reader_todays_month(ruta_csv_tmax_mes_a_mes, mes_actual_str_number)
 
-        # para debugging y ver que los valores extremos se estan haciendo bien
+        # Para debugging y ver que los valores extremos se estan haciendo bien
         est_tmax_12h["0009X"]["tamax"] = 88.8
         
         # bool_est_extrem_12h = abs_12h_comparer_tmax(est_tmax_12h, est_tmax_abs)
