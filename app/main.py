@@ -3,10 +3,9 @@ import os
 import sys
 from fetch.aemet_client import get_data_url_from_aemet, download_data_from_url
 from fetch.extreme_values import get_extreme_values
-from fetch.csv_reader import estacion_reader, tmax_reader_todays_month
+from fetch.csv_reader import tmax_reader_todays_month
 from utils.comparer import abs_12h_comparer_tmax
-from utils.csv_writer import csv_writer_tmax_todos_meses
-from utils.parser import parser_temp_max_todos_meses
+from fetch.extreme_csv_writer_from_aemet import lectura_tmax_absolutas_aemet
 from utils.logger import configurar_logging
 from datetime import date
 import datetime
@@ -29,46 +28,8 @@ def main():
         # Lectura temperaturas extremas
         if False:
             
-            # Leyendo datos de todas las estaciones
-            ruta_csv_estaciones = os.path.join(BASE_DIR, "estaciones.csv")
-            datos_estaciones = estacion_reader(ruta_csv_estaciones)
-
-            i_counter = 0
-            # Bucle temperaturas extremas
-            for i_estacion in datos_estaciones:
-                i_counter = i_counter + 1
-                i_idema = i_estacion.get("idema")
-
-                logging.info(f"Estudiando Tmax en station: {i_idema}. Station {i_counter}/{len(datos_estaciones)}")
-                logging.info("Time sleep: 10")
-                time.sleep(10)
-
-                # Endpoint para valores extremos de temperatura
-                endpoint = f'https://opendata.aemet.es/opendata/api/valores/climatologicos/valoresextremos/parametro/T/estacion/{i_idema}'
-                data_url = get_data_url_from_aemet(endpoint)
-
-                logging.info(f"Estacion: {i_idema} -> data_url tempext: {data_url}")
-                data = download_data_from_url(data_url) # Lista de diccionarios de estaciones meteo
-                
-                dicc_estacion_tmax2 = parser_temp_max_todos_meses(data)
-                """
-                dicc_estacion_tmax2
-                Diccionario con la siguiente estructura:
-                {
-                    "idema": str,
-                    "ene_temp": str, "ene_dia": str, "ene_anio": str,
-                    "feb_temp": ..., "feb_dia": ..., "feb_anio": ...,
-                    ...
-                    "dic_temp": ..., "dic_dia": ..., "dic_anio": ...
-                }
-                """
-                file_name = os.path.join(BASE_DIR, "tmax_estaciones_test.csv")
-                if i_counter == 1: # Primera vez escribiendo en el csv, necesario header
-                    csv_writer_tmax_todos_meses(file_name, i_idema, dicc_estacion_tmax2 ,header_bool = True)
-                else:
-                    # CSV writer sin header
-                    csv_writer_tmax_todos_meses(file_name, i_idema, dicc_estacion_tmax2, header_bool = False)
-
+            # Leyendo datos de todas las estaciones y creando el csv tmax_estaciones.csv
+            lectura_tmax_absolutas_aemet(BASE_DIR)
 
         # Obtención de medidas en tiempo real
         logging.info("Iniciando medidas en tiempo real")

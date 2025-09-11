@@ -1,38 +1,21 @@
 import logging
 import time
 import os
-import sys
 import datetime
 
-# Añadir la carpeta padre al path para que encuentre utils
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from csv_reader import estacion_reader
-from aemet_client import get_data_url_from_aemet, download_data_from_url
+from fetch.csv_reader import estacion_reader
+from fetch.aemet_client import get_data_url_from_aemet, download_data_from_url
 from utils.parser import parser_temp_max_todos_meses
 from utils.csv_writer import csv_writer_tmax_todos_meses
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-nombre_log = "aemetlog-" + datetime.datetime.now().strftime('%Y%m%d%H%M%S') + ".log"
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='[%(asctime)s] %(levelname)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    handlers=[
-        logging.FileHandler(nombre_log, encoding='utf-8'),
-        logging.StreamHandler()
-    ]
-)
-
-logging.info(f"Logger configurado correctamente. Nombre de log: {nombre_log}")
-
-# Lectura temperaturas extremas
-if True:
-    
+# Lectura temperaturas extremas de la aemet
+def lectura_tmax_absolutas_aemet(BASE_DIR):
     # Leyendo datos de todas las estaciones
     ruta_csv_estaciones = os.path.join(BASE_DIR, "estaciones.csv")
     datos_estaciones = estacion_reader(ruta_csv_estaciones)
+
+    # Nombre del csv de tmax_estaciones_ con la fecha
+    nombre_tmax_csv = "tmax_estaciones_" + datetime.datetime.now().strftime('%Y%m%d') + ".csv"
 
     # counter de las estaciones
     i_counter = 0
@@ -54,9 +37,15 @@ if True:
         
         dicc_estacion_tmax = parser_temp_max_todos_meses(data)
 
-        file_name = os.path.join(BASE_DIR, "tmax_estaciones.csv")
-        if i_counter == 1: # Primera vez escribiendo en el csv, necesario header
+        file_name = os.path.join(BASE_DIR, nombre_tmax_csv)
+        if i_counter == 1: # Primera vez escribiendo en el csv, necesario crear el csv si no existe y header
             # CSV writer con header
+
+            # Crear CSV vacío
+            with open(file_name, 'w', newline='', encoding='utf-8') as archivo:
+                # No escribir nada, archivo queda vacío
+                pass
+
             csv_writer_tmax_todos_meses(file_name, i_idema, dicc_estacion_tmax ,header_bool = True)
         else:
             # CSV writer sin header
