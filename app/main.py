@@ -5,6 +5,7 @@ from fetch.aemet_client import get_data_url_from_aemet, download_data_from_url
 from fetch.extreme_values import get_extreme_values
 from fetch.csv_reader import tmax_reader_todays_month
 from utils.comparer import abs_12h_comparer_tmax
+from utils.csv_manager import copiar_ultimo_csv_tmax
 from fetch.extreme_csv_writer_from_aemet import lectura_tmax_absolutas_aemet
 from utils.logger import configurar_logging
 from datetime import date
@@ -50,9 +51,13 @@ def main():
         # est_tmax_12h: nested diccionary de estaciones con los datos de la temperatura maxima. El dicc. contiene fint (hora), tamax, ubi, lat y lon
         est_tmax_12h = get_extreme_values(data, meteo_var="tamax")
         logging.info(f"Valores extremos de T obtenidos. Número de estaciones encontradas: {len(est_tmax_12h.keys())}")
+        
+        # copiando el ultimo csv y nombrandolo "tmax_estaciones.csv"
+        copiar_ultimo_csv_tmax(BASE_DIR, "tmax_estaciones")
+        
         # Reading a csv from tmax_estaciones_fijadas (maximos de temperaturas mes a mes de estaciones)
         # ruta_csv_tmax_mes_a_mes: str enlace a csv con la info de maximas temp de estacion (mes a mes)
-        ruta_csv_tmax_mes_a_mes = os.path.join(BASE_DIR, "tmax_estaciones_mes_a_mes_fijadas.csv")
+        ruta_csv_tmax_mes_a_mes = os.path.join(BASE_DIR, "tmax_estaciones.csv")
 
         mes_actual_str_number = date.today().strftime('%m')
         
@@ -62,7 +67,7 @@ def main():
         dic_est_tmax_mes = tmax_reader_todays_month(ruta_csv_tmax_mes_a_mes, mes_actual_str_number)
 
         # Para debugging y ver que los valores extremos se estan haciendo bien
-        est_tmax_12h["0009X"]["tamax"] = 88.8
+        # est_tmax_12h["0009X"]["tamax"] = 88.8
         
         # bool_est_extrem_12h = abs_12h_comparer_tmax(est_tmax_12h, est_tmax_abs)
         bool_est_tmax_12h_superada = abs_12h_comparer_tmax(est_tmax_12h, dic_est_tmax_mes)
