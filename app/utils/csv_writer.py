@@ -2,10 +2,11 @@ import csv
 
 def csv_writer_tmax_todos_meses (file_name, i_idema, dicc_estacion_tmax2, header_bool):
     
-    # En caso de que el dicc tenga un idema NAN, lo cambiamos por el idema del bucle de main
-    if dicc_estacion_tmax2["idema"] == "Nan":
+    # En caso de que el dicc tenga un idema NaN o None, lo cambiamos por el idema del bucle de main
+    if dicc_estacion_tmax2["idema"] == None or dicc_estacion_tmax2["idema"] == "Nan":
         dicc_estacion_tmax2["idema"] = i_idema
-        
+
+    # Si necesita header (header_bool == True)
     if header_bool == True:
         file = open(file_name,"r+",newline="")
         file.truncate(0) # Clears file
@@ -17,6 +18,8 @@ def csv_writer_tmax_todos_meses (file_name, i_idema, dicc_estacion_tmax2, header
             writer.writeheader()
             # write a row to the csv file
             writer.writerow(dicc_estacion_tmax2)
+    
+    # Si no necesita header (header_bool == False)
     else:
         with open(file_name, 'a', encoding='UTF8', newline='') as f:
             # create the csv writer

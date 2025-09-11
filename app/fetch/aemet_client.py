@@ -39,7 +39,7 @@ def get_data_url_from_aemet(endpoint, max_retries=20, delay=5):
                 logging.warning(f"Sin datos de get_data_url_from_aemet ({estado}). Se devuelve un string Nan")
                 return "Nan"
             elif estado == 429:
-                # Nos hemos pasado del tiempo. añadimos tiempo
+                # nos hemos pasado del tiempo. añadimos tiempo
                 logging.warning(f"Pasado de tiempo ({estado}). Espera de un minuto. Se añade un intento.")
                 attempts = attempts-1
                 time.sleep(60)
@@ -56,13 +56,13 @@ def get_data_url_from_aemet(endpoint, max_retries=20, delay=5):
         attempts += 1
         
     print(f"No se pudo obtener la URL de datos tras {max_retries} intentos. Devolviendo string NaN")
-    return "Nan"
+    return None
     
 def download_data_from_url(data_url, retries=10, delay=5):
     logging.info(f"Iniciando download_data_from_url. Data url: {data_url}")
     if data_url == "Nan":
         logging.warning("Input: string Nan. Devolviendo un string Nan en download_data_from_url.")
-        return "Nan"
+        return None
     for intento in range(retries):
         try:
             response = requests.get(data_url, timeout=30)
@@ -74,4 +74,4 @@ def download_data_from_url(data_url, retries=10, delay=5):
             logging.error(f"Intento {intento+1} fallido por error inesperado: {e}")
         time.sleep(delay)
     logging.info(f"No se pudo obtener la data tras {retries} intentos. Devolviendo string NaN")
-    return "Nan"
+    return None
