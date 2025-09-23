@@ -1,9 +1,9 @@
 import time
 import os
 import sys
-from fetch.aemet_client import get_data_url_from_aemet, download_data_from_url
-from fetch.extreme_values import get_extreme_values
+
 from fetch.csv_reader import tmax_reader_todays_month
+from fetch.halfday_values import get_12h_values
 from utils.comparer import abs_12h_comparer_tmax
 from utils.csv_manager import copiar_ultimo_csv_tmax
 from fetch.extreme_csv_writer_from_aemet import lectura_tmax_absolutas_aemet
@@ -34,36 +34,24 @@ def main():
 
         # Obtención de medidas en tiempo real
         logging.info("Iniciando medidas en tiempo real")
-
-        # Endpoint de las medidas en tiempo real
-        endpoint = 'https://opendata.aemet.es/opendata/api/observacion/convencional/todas'
-
-        # data_url: str con el enlace a los datos de 12 horas (e.g., https://opendata.aemet.es/opendata/sh/cfca0eb5)
-        data_url = get_data_url_from_aemet(endpoint)
-        # data: lista de diccionarios de estaciones meteo. Cada diccionario tiene toda la info de las 12 últimas horas
-        data = download_data_from_url(data_url, retries=10)
-        logging.info(f"Datos descargados. Lineas: {len(data)}")
-
-        # Si el data es "nan" es que no se ha podido conectar nada
-        if isinstance(data, str) and data.lower() == "nan":
-            raise ValueError("La variable 'data' es un string 'Nan'. No se ha podido conectar.")
         
-        # est_tmax_12h: nested diccionary de estaciones con los datos de la temperatura maxima. El dicc. contiene fint (hora), tamax, ubi, lat y lon
-        est_tmax_12h = get_extreme_values(data, meteo_var="tamax")
-        logging.info(f"Valores extremos de T obtenidos. Número de estaciones encontradas: {len(est_tmax_12h.keys())}")
-        
-        # copiando el ultimo csv y nombrandolo "tmax_estaciones.csv"
+        # est_tmax_12h: máximos de temperatura para cada estacion en las ultimas 12h
+        est_tmax_12h = get_12h_values()
+
+        # Copiar el ultimo csv generado por lectura_tmax_absolutas_aemet
+        # Nombrarlo "tmax_estaciones.csv" en la carpeta
+        # tmax_estaciones.csv: maximos de temperaturas mes a mes de estaciones
         copiar_ultimo_csv_tmax(BASE_DIR, "tmax_estaciones")
         
-        # Reading a csv from tmax_estaciones_fijadas (maximos de temperaturas mes a mes de estaciones)
-        # ruta_csv_tmax_mes_a_mes: str enlace a csv con la info de maximas temp de estacion (mes a mes)
+        # Leer el csv de tmax_estaciones
         ruta_csv_tmax_mes_a_mes = os.path.join(BASE_DIR, "tmax_estaciones.csv")
 
+        # mes actual en string como numero (ejemplo: agosto es "08")
         mes_actual_str_number = date.today().strftime('%m')
         
         # est_tmax_mes_test: Diccionario con las temperaturas máximas por estación (idema).
         # Cada entrada contiene temperatura, día y año del récord mensual. Claves: mes_target_temMax, mes_target_diaMax, mes_target_anioMax
-        # Los valores inválidos se retornan como None.
+        # Los valores inválidos se retornan como None
         dic_est_tmax_mes = tmax_reader_todays_month(ruta_csv_tmax_mes_a_mes, mes_actual_str_number)
 
         # Para debugging y ver que los valores extremos se estan haciendo bien
@@ -86,6 +74,8 @@ def main():
                 else:
                     print(f"    Info del día de hoy{est_tmax_12h[key]}.")
                     print(f"    Info del día histórico{bool_est_tmax_12h_superada[1][key]}.")
+
+        # encapsulado termin aqui: saber los maximos superados estas ultimas 12h
 
         print("Acabando programa")
 
