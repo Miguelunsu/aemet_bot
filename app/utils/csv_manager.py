@@ -6,10 +6,10 @@ import logging
 
 def copiar_ultimo_csv_tmax(BASE_DIR, nombre_csv):
     """
-    Función que busca y copia el CSV más reciente de temperaturas máximas
+    Función que busca y copia el CSV más reciente con nombre que coincide con nombre_csv
 
     BASE_DIR: directorio base de main
-    nombre_csv: tmax_estaciones
+    nombre_csv: nombre del csv (ejemplo: tmax_estaciones)
     """
     if nombre_csv not in ["tmax_estaciones"]:
         raise Exception

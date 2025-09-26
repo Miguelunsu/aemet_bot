@@ -27,7 +27,7 @@ def main():
         logging.info("Iniciando main.")
 
         # Lectura temperaturas extremas
-        if False:
+        if True:
             
             # Leyendo datos de todas las estaciones y creando el csv tmax_estaciones.csv
             lectura_tmax_absolutas_aemet(BASE_DIR)
@@ -35,7 +35,7 @@ def main():
         # Obtención de medidas en tiempo real
         logging.info("Iniciando medidas en tiempo real")
         
-        # est_tmax_12h: máximos de temperatura para cada estacion en las ultimas 12h
+        # est_tmax_12h: diccionario de máximos de temperatura para cada estacion en las ultimas 12h
         est_tmax_12h = get_12h_values()
 
         # Copiar el ultimo csv generado por lectura_tmax_absolutas_aemet
