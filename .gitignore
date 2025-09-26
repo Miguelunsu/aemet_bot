@@ -1,2 +1,4 @@
 *.log
 *.pyc
+.env
+app/fetch/__pycache__/

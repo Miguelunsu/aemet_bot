@@ -49,15 +49,14 @@ def main():
         # mes actual en string como numero (ejemplo: agosto es "08")
         mes_actual_str_number = date.today().strftime('%m')
         
-        # est_tmax_mes_test: Diccionario con las temperaturas máximas por estación (idema).
+        # dic_est_tmax_mes: diccionario con las temperaturas máximas por estación (idema).
         # Cada entrada contiene temperatura, día y año del récord mensual. Claves: mes_target_temMax, mes_target_diaMax, mes_target_anioMax
-        # Los valores inválidos se retornan como None
         dic_est_tmax_mes = tmax_reader_todays_month(ruta_csv_tmax_mes_a_mes, mes_actual_str_number)
 
         # Para debugging y ver que los valores extremos se estan haciendo bien
         # est_tmax_12h["0009X"]["tamax"] = 88.8
         
-        # bool_est_extrem_12h = abs_12h_comparer_tmax(est_tmax_12h, est_tmax_abs)
+        # bool_est_tmax_12h_superada: nested diccionario de bools: bool_est_extrem_12h, historic_day_tmax
         bool_est_tmax_12h_superada = abs_12h_comparer_tmax(est_tmax_12h, dic_est_tmax_mes)
     
         # keys que contienen los idemas que superaron la T max

@@ -1,31 +1,13 @@
 services:
-  postgres:
-    image: postgres:14
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
   app:
-    build: .
+    build: .  # Usa el Dockerfile del directorio actual para construir la imagen
     network_mode: "host"
     volumes:
-      - ./app:/app
-    depends_on:
-      - postgres
+      - ./app:/app    
     environment:
-      - DB_HOST=${DB_HOST}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - AEMET_API_KEY=${AEMET_API_KEY}
-    working_dir: /app
-    command: python main.py
-
-volumes:
-  pgdata:
+      - AEMET_API_KEY=${AEMET_API_KEY}  # Variable de entorno para la API de AEMET
+      - TWITTER_API_KEY=${TWITTER_API_KEY}  # Clave de la API de Twitter
+      - TWITTER_API_SECRET=${TWITTER_API_SECRET}  # Secreto de la API de Twitter
+      - TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN}  # Token de acceso de Twitter
+      - TWITTER_ACCESS_SECRET=${TWITTER_ACCESS_SECRET}  # Secreto del token de acceso
+    working_dir: /app  # Directorio de trabajo dentro del contenedor
