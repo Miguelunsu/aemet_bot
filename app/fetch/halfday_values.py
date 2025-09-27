@@ -9,7 +9,7 @@ def get_12h_values():
     # Devuelve: variable est_extreme_12h: Nested diccionary de estaciones con los datos de variable max.
     # Key: idema. Dentro: diccionario con fint (hora), tamax, ubi, lat y lon
 
-    # encapsulado desde aqui: obtener est_tmax_12h
+    # encapsulado desde aqui: obtener max_temp_12h_estaciones
 
     # Endpoint de las medidas en tiempo real
     endpoint = 'https://opendata.aemet.es/opendata/api/observacion/convencional/todas'
@@ -24,8 +24,8 @@ def get_12h_values():
     if isinstance(data, str) and data.lower() == "nan":
         raise ValueError("La variable 'data' es un string 'Nan'. No se ha podido conectar.")
     
-    # est_tmax_12h: nested diccionary de estaciones con los datos de la temperatura maxima. El dicc. contiene fint (hora), tamax, ubi, lat y lon
-    est_tmax_12h = get_extreme_values(data, meteo_var="tamax")
-    logging.info(f"Valores extremos de T obtenidos. Número de estaciones encontradas: {len(est_tmax_12h.keys())}")
+    # max_temp_12h_estaciones: nested diccionary de estaciones con los datos de la temperatura maxima. El dicc. contiene fint (hora), tamax, ubi, lat y lon
+    max_temp_12h_estaciones = get_extreme_values(data, meteo_var="tamax")
+    logging.info(f"Valores extremos de T obtenidos. Número de estaciones encontradas: {len(max_temp_12h_estaciones.keys())}")
 
-    return est_tmax_12h
+    return max_temp_12h_estaciones

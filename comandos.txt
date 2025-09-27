@@ -1,4 +1,4 @@
-Iniciar (crear y correr los contenedores):
+Iniciar (crear y correr los contenedores), ejecutar el contenedor
     docker-compose up -d
         -d: lo ejecuta en segundo plano ("detached").
     docker-compose up -d --build
