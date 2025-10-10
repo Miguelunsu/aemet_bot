@@ -4,7 +4,7 @@ import shutil
 import re
 import logging
 
-def copiar_ultimo_csv_tmax(BASE_DIR, nombre_csv):
+def actualizar_csv(BASE_DIR, nombre_csv):
     """
     Función que busca y copia el CSV más reciente con nombre que coincide con nombre_csv
 
@@ -52,7 +52,3 @@ def copiar_ultimo_csv_tmax(BASE_DIR, nombre_csv):
     except Exception as e:
         print(f"Error al copiar: {e}")
         return False
-
-# Ejemplo de uso
-if __name__ == "__main__":
-    copiar_ultimo_csv_tmax()

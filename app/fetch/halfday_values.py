@@ -1,8 +1,8 @@
 from fetch.aemet_client import get_data_url_from_aemet, download_data_from_url
-from fetch.extreme_values import get_extreme_values
+from fetch.extreme_values import get_station_max_last12h, get_station_sum_last12h
 import logging
 
-def get_12h_values():
+def get_12h_values(meteo_var):
     # data: diccionario que tiene todas las medidas en tiempo real (una por hora)
     # meteo_var: variable meteo de la que queremos los datos extremos por estacion
     
@@ -25,7 +25,9 @@ def get_12h_values():
         raise ValueError("La variable 'data' es un string 'Nan'. No se ha podido conectar.")
     
     # max_temp_12h_estaciones: nested diccionary de estaciones con los datos de la temperatura maxima. El dicc. contiene fint (hora), tamax, ubi, lat y lon
-    max_temp_12h_estaciones = get_extreme_values(data, meteo_var="tamax")
-    logging.info(f"Valores extremos de T obtenidos. Número de estaciones encontradas: {len(max_temp_12h_estaciones.keys())}")
-
-    return max_temp_12h_estaciones
+    if meteo_var == "tamax": # entonces queremos el maximo
+        extreme_value_12h_estaciones = get_station_max_last12h(data, meteo_var=meteo_var)
+    elif meteo_var == "prec": # entonces queremos la suma
+        extreme_value_12h_estaciones = get_station_sum_last12h(data, meteo_var=meteo_var)
+    logging.info(f"Valores extremos de T obtenidos. Número de estaciones encontradas: {len(extreme_value_12h_estaciones.keys())}")
+    return extreme_value_12h_estaciones

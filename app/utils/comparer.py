@@ -2,84 +2,85 @@ from utils.auxiliar import string_a_float_con_decimal
 import logging
 from datetime import date
 
-def abs_12h_comparer_tmax(max_temp_12h_estaciones, datos_temp_estaciones):
-    # Compara el diccionario de 12h y abs para ver si se supera la temp. maxima
-    # max_temp_12h_estaciones: diccionario con las temperaturas maximas en las ultimas 12 horas
-    # datos_temp_estaciones: diccionario con las temperaturas maximas históricas de ese mes y absolutas
+def check_record_breaks(max_value_12h_estaciones, redords_estaciones):
+    # Compara el diccionario de 12h y abs para ver si se supera la value. maxima
+    # max_value_12h_estaciones: diccionario con las valueeraturas maximas en las ultimas 12 value
+    # redords_estaciones: diccionario con las valueeraturas maximas históricas de ese mes y absolutas
     
-    # Crear un nested diccionario de bools a partir de los datos de 12 horas, con las mismas keys (idemas)
-    # Tambien el diccionario que tiene el dia anterior de la tmax
-    bool_est_extrem_12h = dict.fromkeys(max_temp_12h_estaciones)
-    historic_day_tmax = dict.fromkeys(max_temp_12h_estaciones)
-
-    for key in max_temp_12h_estaciones.keys():
-        bool_est_extrem_12h[key] = {
-            "Tmax_superada_mes": False,
-            "Tmax_superada_abs": False}
-        historic_day_tmax[key] = {False}
+    # Devuelve un set de bools que indican los records
+    # Nested diccionario de bools
+    records_superados_bool = {}
+    previous_record_info = {}
+    for key in max_value_12h_estaciones.keys():
+        records_superados_bool[key] = {
+            "valor_superado_mes": False,
+            "valor_superado_abs": False}
+        previous_record_info[key] = {False}
         
     # Bucle para ver si hay alguna estación en la que se ha superado la tmax
-    for idema in max_temp_12h_estaciones:     
+    for idema in max_value_12h_estaciones:     
         # Extrayendo el string de tmax de 12h AQUI EL tmax_str ES UN FLOAT, SE PUEDE CAMBIAR (EJEPLO 31.1)
-        tamax_float = max_temp_12h_estaciones[idema]["tamax"]
-
+        ole = max_value_12h_estaciones[idema]
+        value_float = max_value_12h_estaciones[idema]["value"]
+        if idema == "7012C":
+            pass
         # Comprobamos que no sea un string "NaN"
         try:
-            tamax_float = float(tamax_float)
+            value_float = float(value_float)
         except (ValueError, TypeError):
-            logging.warning(f"Valor inválido de tamax para {idema}: {tamax_float}. Saltando...")
+            logging.warning(f"Valor inválido de value para {idema}: {value_float}. Saltando...")
             continue
 
-        # Usamos .get(idema) para obtener el valor asociado a la clave 'idema' en datos_temp_estaciones
+        # Usamos .get(idema) para obtener el valor asociado a la clave 'idema' en redords_estaciones
         # Esto comprueba automáticamente si la clave existe y evita un KeyError si no está
-        # Si 'idema' no está presente, datos_temp_idema será None
-        datos_temp_idema = datos_temp_estaciones.get(idema)
-        # datos_temp_idema es un diccionario que contiene de este especifico idema.
+        # Si 'idema' no está presente, redord_idema será None
+        redord_idema = redords_estaciones.get(idema)
+        # redord_idema es un diccionario que contiene de este especifico idema.
         # Por ejemplo, para temepraturas: temMax,diaMax,mesMax,anioMax
 
         # Comprobamos que lo obtenido sea un diccionario válido. Ahora tendra claves
         # "mes_target_temMax, mes_target_diaMax, mes_target_anioMax"
-        # 'abs_temp', 'abs_dia', 'abs_mes', 'abs_anio'
-        if isinstance(datos_temp_idema, dict):
+        # 'abs_value', 'abs_dia', 'abs_mes', 'abs_anio'
+        if isinstance(redord_idema, dict):
 
             # Intentamos obtener la clave "temMax" del subdiccionario.
             # Si no está, se devuelve None.
-            mensual_valor = datos_temp_idema.get("mensual_valor")
-            absoluto_valor = datos_temp_idema.get("absoluto_valor")
+            valor_record_mensual = redord_idema.get("mensual_valor")
+            valor_record_absoluto = redord_idema.get("absoluto_valor")
 
             # Esperamos un diccionario.
             # Esta línea descarta valores vacíos, None, "", "nan", "NaN", etc.
-            if not mensual_valor or (isinstance(mensual_valor, str) and mensual_valor.lower() == "nan"):
-                logging.warning(f"⚠️ temMax histórica no válida para {idema}: {mensual_valor}. Saltando...")
+            if not valor_record_mensual or (isinstance(valor_record_mensual, str) and valor_record_mensual.lower() == "nan"):
+                logging.warning(f"⚠️ temMax histórica no válida para {idema}: {valor_record_mensual}. Saltando...")
                 continue
             
-            if mensual_valor is not None and tamax_float > mensual_valor:
-                bool_est_extrem_12h[idema]["Tmax_superada_mes"] = True
+            if valor_record_mensual is not None and value_float > valor_record_mensual:
+                records_superados_bool[idema]["valor_superado_mes"] = True
                 
-                historic_day_tmax[idema] = {
-                    "dia": datos_temp_idema.get("mes_target_diaMax"),
+                previous_record_info[idema] = {
+                    "dia": redord_idema.get("mensual_dia"),
                     "mes": date.today().strftime('%m'),
-                    "anio": datos_temp_idema.get("mes_target_anioMax"),
-                    "temp": mensual_valor
+                    "anio": redord_idema.get("mensual_anio"),
+                    "value": valor_record_mensual
                 }
-                logging.info(f"T máxima del mes superada en {idema}: actual {tamax_float} > histórica del mes {mensual_valor}")
-                logging.info(f"Info del día del mes con temperatura max anterior: {historic_day_tmax}")
+                logging.info(f"T máxima del mes superada en {idema}: actual {value_float} > histórica del mes {valor_record_mensual}")
+                # logging.info(f"Info del día del mes con valueeratura max anterior: {previous_record_info}")
                 # Ahora obtenemos la mas alta absoluta
-                # mensual_valor = datos_temp_idema.get("mes_target_temMax")
-                if tamax_float > absoluto_valor:
-                    bool_est_extrem_12h[idema]["Tmax_superada_abs"] = True
-                    historic_day_tmax[idema] = {
-                        "dia": datos_temp_idema.get("abs_dia"),
-                        "mes": datos_temp_idema.get("abs_mes"),
-                        "anio": datos_temp_idema.get("abs_anio"),
-                        "temp": absoluto_valor
+                # valor_record_mensual = redord_idema.get("mes_target_temMax")
+                if valor_record_absoluto is not None and value_float > valor_record_absoluto:
+                    records_superados_bool[idema]["valor_superado_abs"] = True
+                    previous_record_info[idema] = {
+                        "dia": redord_idema.get("absoluto_dia"),
+                        "mes": redord_idema.get("absoluto_mes"),
+                        "anio": redord_idema.get("absoluto_anio"),
+                        "value": valor_record_absoluto
                     }
 
-                    logging.info(f"T máxima absoluta superada en {idema}: actual {tamax_float} > histórica del mes {absoluto_valor}")
-                    logging.info(f"Info del día del mes con temperatura max anterior: {historic_day_tmax}")
+                    logging.info(f"T máxima absoluta superada en {idema}: actual {value_float} > histórica del mes {valor_record_absoluto}")
+                    # logging.info(f"Info del día del mes con valueeratura max anterior: {previous_record_info}")
             else:
-                logging.info(f"T máxima NO superada en {idema}: actual {tamax_float} > histórica del mes {mensual_valor}")
+                logging.info(f"T máxima NO superada en {idema}: actual {value_float} > histórica del mes {valor_record_mensual}")
         else:
             logging.warning(f"No se encontró una tmax para el idema {idema}")
     
-    return [bool_est_extrem_12h, historic_day_tmax]
+    return [records_superados_bool, previous_record_info]

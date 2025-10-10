@@ -9,7 +9,7 @@ def get_api_key():
         raise ValueError("No se encontró la API key en las variables de entorno")
     return api_key
 
-def get_data_url_from_aemet(endpoint, max_retries=20, delay=5):
+def get_data_url_from_aemet(endpoint, max_retries=30, delay=8):
     logging.info("Iniciando get_data_url_from_aemet")
     api_key = get_api_key()
     headers = {
