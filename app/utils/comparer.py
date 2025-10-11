@@ -51,9 +51,10 @@ def check_record_breaks(max_value_12h_estaciones, redords_estaciones):
             # Esperamos un diccionario.
             # Esta línea descarta valores vacíos, None, "", "nan", "NaN", etc.
             if not valor_record_mensual or (isinstance(valor_record_mensual, str) and valor_record_mensual.lower() == "nan"):
-                logging.warning(f"⚠️ temMax histórica no válida para {idema}: {valor_record_mensual}. Saltando...")
+                logging.warning(f"Valor de valor_record_mensual no válido para {idema} ({valor_record_mensual}). Saltando...")
                 continue
             
+            # empezamos estudiando la del mes
             if valor_record_mensual is not None and value_float > valor_record_mensual:
                 records_superados_bool[idema]["valor_superado_mes"] = True
                 
@@ -63,10 +64,9 @@ def check_record_breaks(max_value_12h_estaciones, redords_estaciones):
                     "anio": redord_idema.get("mensual_anio"),
                     "value": valor_record_mensual
                 }
-                logging.info(f"T máxima del mes superada en {idema}: actual {value_float} > histórica del mes {valor_record_mensual}")
-                # logging.info(f"Info del día del mes con valueeratura max anterior: {previous_record_info}")
+                logging.debug(f"Valor máximo del mes superada en {idema}: actual {value_float} > histórico del mes {valor_record_mensual}")
+
                 # Ahora obtenemos la mas alta absoluta
-                # valor_record_mensual = redord_idema.get("mes_target_temMax")
                 if valor_record_absoluto is not None and value_float > valor_record_absoluto:
                     records_superados_bool[idema]["valor_superado_abs"] = True
                     previous_record_info[idema] = {
@@ -76,11 +76,10 @@ def check_record_breaks(max_value_12h_estaciones, redords_estaciones):
                         "value": valor_record_absoluto
                     }
 
-                    logging.info(f"T máxima absoluta superada en {idema}: actual {value_float} > histórica del mes {valor_record_absoluto}")
-                    # logging.info(f"Info del día del mes con valueeratura max anterior: {previous_record_info}")
+                    logging.debug(f"Valor máximo absoluto superada en {idema}: actual {value_float} > histórico absoluto {valor_record_absoluto}")
             else:
-                logging.info(f"T máxima NO superada en {idema}: actual {value_float} > histórica del mes {valor_record_mensual}")
+                logging.debug(f"Valor máximo no superada en {idema}: actual {value_float} < histórico del mes {valor_record_mensual}")
         else:
-            logging.warning(f"No se encontró una tmax para el idema {idema}")
+            logging.warning(f"No se encontró un valor para el idema {idema}")
     
     return [records_superados_bool, previous_record_info]

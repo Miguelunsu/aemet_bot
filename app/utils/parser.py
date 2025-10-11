@@ -89,90 +89,14 @@ def parser_temp_max_todos_meses(data):
     # Bucle para agregar todos los meses automáticamente
     for i, mes in enumerate(MESES):
         resultado.update({
-            f"{mes}_temp": temps[i],
+            f"{mes}_valor": temps[i],
             f"{mes}_dia": dias[i],
             f"{mes}_anio": años[i]
         })
     
     # Agregar valores absolutos
     resultado.update({
-        "abs_temp": abs_temp,
-        "abs_dia": abs_dia, 
-        "abs_mes": abs_mes,
-        "abs_anio": abs_anio
-    })
-    
-    logging.info(f"Estación {idema}: obtención de todas las temperaturas completada.")
-    return resultado
-
-def parser_pluv_max_todos_meses(data):
-    """
-    Procesa los datos de temperaturas máximas de una estación meteorológica.
-
-    Parámetros
-    ----------
-    data : dict o str
-        - Si es un diccionario: debe contener las claves:
-            * "indicativo" : str -> identificador de la estación.
-            * "temMax"     : list -> lista con las temperaturas máximas mensuales (índices 1–12).
-            * "diaMax"     : list -> lista con los días en los que se alcanzaron esas temperaturas.
-            * "anioMax"    : list -> lista con los años en los que se alcanzaron esas temperaturas.
-        - Si es la cadena None, se devuelve un resultado con todos los campos a None.
-
-    Retorna
-    -------
-    dict
-        Diccionario con la siguiente estructura:
-        {
-            "idema": str,
-            "ene_temp": str, "ene_dia": str, "ene_anio": str,
-            "feb_temp": ..., "feb_dia": ..., "feb_anio": ...,
-            ...
-            "dic_temp": ..., "dic_dia": ..., "dic_anio": ...
-        }
-
-    Notas
-    -----
-    - Si las listas "temMax", "diaMax" o "anioMax" no existen o no son válidas,
-      todos los valores correspondientes se rellenan con None.
-    - Los índices se acceden de 0 a 11 (enero–diciembre), por lo que el índice 12
-      de las listas no se utiliza.
-    - Muestra un mensaje en consola indicando la estación procesada.
-    """
-
-    # Manejo del caso None/"Nan"
-    if data is None or data == "Nan": 
-        logging.info("parser_temp_max: Variable data es Nan. Devolviendo lista de Nones.")
-        return resultado_vacio()
-    
-    # Extracción con valores por defecto
-    idema = data.get("indicativo")
-    abs_mes = data.get("mesMax")
-    
-    # Procesar las 3 listas de una vez (evita código repetido)
-    temps = procesar_lista(data.get("temMax"))
-    dias = procesar_lista(data.get("diaMax")) 
-    años = procesar_lista(data.get("anioMax"))
-    
-    # Temperatura absoluta (índice 12) con validación
-    abs_temp = procesar_lista(data.get("temMax"), devolver_abs=True)
-    abs_dia = procesar_lista(data.get("diaMax"), devolver_abs=True)
-    abs_anio = procesar_lista(data.get("anioMax"), devolver_abs=True)
-    
-    # Construcción dinámica del diccionario (evita 36 líneas repetitivas)
-    resultado = {"idema": idema}
-    
-    # Bucle para agregar todos los meses automáticamente
-    for i, mes in enumerate(MESES):
-        resultado.update({
-            f"{mes}_temp": temps[i],
-            f"{mes}_dia": dias[i],
-            f"{mes}_anio": años[i]
-        })
-    
-    # Agregar valores absolutos
-    resultado.update({
-        "abs_temp": abs_temp,
+        "abs_valor": abs_temp,
         "abs_dia": abs_dia, 
         "abs_mes": abs_mes,
         "abs_anio": abs_anio
@@ -241,14 +165,14 @@ def parser_pluv_max_todos_meses(data):
     # Bucle para agregar todos los meses automáticamente
     for i, mes in enumerate(MESES):
         resultado.update({
-            f"{mes}_pluv": temps[i],
+            f"{mes}_valor": temps[i],
             f"{mes}_dia": dias[i],
             f"{mes}_anio": años[i]
         })
     
     # Agregar valores absolutos
     resultado.update({
-        "abs_pluv": abs_pluv,
+        "abs_valor": abs_pluv,
         "abs_dia": abs_dia, 
         "abs_mes": abs_mes,
         "abs_anio": abs_anio

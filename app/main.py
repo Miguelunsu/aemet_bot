@@ -57,49 +57,57 @@ def main():
         records_temp_estaciones = get_max_values_current_month(ruta_csv_tmax_mes_a_mes, mes_actual_str_number)
         records_pluv_estaciones = get_max_values_current_month(ruta_csv_pluvmax_mes_a_mes, mes_actual_str_number)
 
-        # Ajuste temperaturas max del csv
+        # Ajuste de unidades extremas vs 12h
+        # Para temp: en extremas: xxx
+        #            en 12h, xxx
+        # Para prec: en extremas: decimas de mm
+        #            en 12h, mm
         if True:
             for idema in records_temp_estaciones.keys():
+                # temp
                 if records_temp_estaciones[idema]["mensual_valor"] is not None:
                     records_temp_estaciones[idema]["mensual_valor"] = records_temp_estaciones[idema]["mensual_valor"]*0.1
                 if records_temp_estaciones[idema]["absoluto_valor"] is not None:   
                     records_temp_estaciones[idema]["absoluto_valor"] = records_temp_estaciones[idema]["absoluto_valor"]*0.1
-       
-        # records_superados_temp_bool: nested diccionario de bools: valor_superado_mes, valor_superado_abs
-        # records_superados_temp_bool, previous_record_temp_info = check_record_breaks(max_temp_12h_estaciones, datos_temp_estaciones)
+                # prec
+                if records_pluv_estaciones[idema]["mensual_valor"] is not None:
+                    records_pluv_estaciones[idema]["mensual_valor"] = records_pluv_estaciones[idema]["mensual_valor"]*0.1
+                if records_pluv_estaciones[idema]["absoluto_valor"] is not None:   
+                    records_pluv_estaciones[idema]["absoluto_valor"] = records_pluv_estaciones[idema]["absoluto_valor"]*0.1
+
+        # Bools que guardan los records
         records_superados_temp_bool, previous_record_temp_info = check_record_breaks(max_temp_12h_estaciones, records_temp_estaciones)
         records_superados_pluv_bool, previous_record_pluv_info = check_record_breaks(sum_pluv_12h_estaciones, records_pluv_estaciones)
 
         # keys que contienen los idemas que superaron la T max
         idemas_tmax_mes_superada = []
-        print("Estaciones que superaron su T máxima:")
+        logging.info("Estaciones que superaron su T máxima:")
         for key, valores in records_superados_temp_bool.items():
             if valores.get("valor_superado_mes") is True:
-                print(f"-> Superada para la estacion: {key}.")
                 idemas_tmax_mes_superada.append(key)
                 if valores.get("valor_superado_abs") is True:
-                    print(f"!!! Superada de manera absoluta: {key}")
-                    print(f"    Info del día de hoy{max_temp_12h_estaciones[key]}.")
-                    print(f"    Info del día histórico{previous_record_temp_info[key]}.")
+                    logging.info(f"-> Superada la ABSOLUTA: {key}")
+                    logging.info(f"Día de hoy{max_temp_12h_estaciones[key]}.")
+                    logging.info(f"Día histórico{previous_record_temp_info[key]}.")
                 else:
-                    print(f"    Info del día de hoy{max_temp_12h_estaciones[key]}.")
-                    print(f"    Info del día histórico{previous_record_temp_info[key]}.")
+                    logging.info(f"-> Superada la MENSUAL la estacion: {key}.")
+                    logging.info(f"Día de hoy{max_temp_12h_estaciones[key]}.")
+                    logging.info(f"Día histórico{previous_record_temp_info[key]}.")
 
-        print("Estaciones que superaron su prec máxima:")
+        logging.info("Estaciones que superaron su prec máxima:")
         for key, valores in records_superados_pluv_bool.items():
             if valores.get("valor_superado_mes") is True:
-                print(f"-> Superada para la estacion: {key}.")
                 idemas_tmax_mes_superada.append(key)
                 if valores.get("valor_superado_abs") is True:
-                    print(f"!!! Superada de manera absoluta: {key}")
-                    print(f"    Info del día de hoy{sum_pluv_12h_estaciones[key]}.")
-                    print(f"    Info del día histórico{previous_record_pluv_info[key]}.")
+                    logging.info(f"-> Superada la ABSOLUTA: {key}")
+                    logging.info(f"Día de hoy{sum_pluv_12h_estaciones[key]}.")
+                    logging.info(f"Día histórico{previous_record_pluv_info[key]}.")
                 else:
-                    print(f"    Info del día de hoy{sum_pluv_12h_estaciones[key]}.")
-                    print(f"    Info del día histórico{previous_record_pluv_info[key]}.")
-        # encapsulado termin aqui: saber los maximos superados estas ultimas 12h
+                    logging.info(f"-> Superada la MENSUAL la estacion: {key}.")
+                    logging.info(f"Día de hoy{sum_pluv_12h_estaciones[key]}.")
+                    logging.info(f"Día histórico{previous_record_pluv_info[key]}.")
 
-        print("Acabando programa")
+        logging.info("Acabando programa")
 
         # Twittear
         # post_tweet("Bot funcionando con Tweepy Client y OAuth1 user context")
