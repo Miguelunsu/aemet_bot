@@ -8,7 +8,7 @@ from fetch.aemet_client import get_data_url_from_aemet, download_data_from_url
 from utils.parser import parser_temp_max_todos_meses, parser_pluv_max_todos_meses
 from utils.csv_writer import csv_writer_tmax_todos_meses
 
-# Lectura temperaturas extremas de la aemet
+# Lectura temperaturas extremas y lluvias de la aemet
 def lectura_absolutas_aemet(BASE_DIR):
     # Leyendo datos de todas las estaciones
     ruta_csv_estaciones = os.path.join(BASE_DIR, "estaciones.csv")

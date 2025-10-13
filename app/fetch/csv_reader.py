@@ -92,8 +92,8 @@ def get_max_values_current_month(ruta_values_abs_csv, mes_actual_str_number):
                 not es_valor_valido(dia_val) or
                 not es_valor_valido(anio_val)):
 
-                logging.info(
-                    f"Datos del get_max_values_current_month no convertibles (mensuales). Fila idema: {fila['idema']}")
+                #logging.info(
+                #    f"Datos del get_max_values_current_month no convertibles (mensuales). Fila idema: {fila['idema']}")
                 
                 dic_datos_estaciones[fila['idema']] = {
                     'mensual_valor': None,
@@ -121,8 +121,8 @@ def get_max_values_current_month(ruta_values_abs_csv, mes_actual_str_number):
                 not es_valor_valido(absoluto_mes_val) or
                 not es_valor_valido(absoluto_anio_val)):
 
-                logging.info(
-                    f"Datos del get_max_values_current_month no convertibles (absolutos). Fila idema: {fila['idema']}")
+                #logging.info(
+                #    f"Datos del get_max_values_current_month no convertibles (absolutos). Fila idema: {fila['idema']}")
 
                 dic_datos_estaciones[fila['idema']].update({
                     'absoluto_valor': None,

@@ -26,7 +26,7 @@ def actualizar_csv(BASE_DIR, nombre_csv):
     for archivo in archivos:
         nombre = os.path.basename(archivo)
         # Buscar el formato _YYYYMMDD.csv
-        match = re.search(r'tmax_estaciones_(\d{8})\.csv$', nombre)
+        match = re.search(rf'{nombre_csv}_(\d{8})\.csv$', nombre)
         if match:
             fecha = int(match.group(1))
             archivos_con_fechas.append((archivo, fecha, nombre))

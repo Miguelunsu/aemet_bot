@@ -13,28 +13,20 @@ import datetime
 from bot.twitter_bot import post_tweet
 import logging
 
-def main():
-    # Configurar logs
-    configurar_logging()
+def lecutura_extremos_actualizar_csvs(BASE_DIR):
+    # Leyendo datos de todas las estaciones (temp y pluv) y actualiza los csvs
     
-    logging.info(f"Python version: {sys.version}")
+    lectura_absolutas_aemet(BASE_DIR)
+
+    # Copiar el ultimo csv generado por lectura_absolutas_aemet
+    actualizar_csv(BASE_DIR, "tmax_estaciones")
+    actualizar_csv(BASE_DIR, "pluvmax_estaciones")
+
+def get_records_data(BASE_DIR):
+    # Obtiene la info de los records
     
-    # Ruta al archivo CSV relativa al archivo actual. Usado para csv's.
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    
-    # try que encapsula todo el programa
     try:
         logging.info("Iniciando main.")
-
-        # Lectura temperaturas extremas
-        if False:
-            
-            # Leyendo datos de todas las estaciones y creando el csv tmax_estaciones.csv
-            lectura_absolutas_aemet(BASE_DIR)
-
-            # Copiar el ultimo csv generado por lectura_absolutas_aemet
-            actualizar_csv(BASE_DIR, "tmax_estaciones")
-            actualizar_csv(BASE_DIR, "pluvmax_estaciones")
 
         # Obtención de medidas en tiempo real
         logging.info("Iniciando medidas en tiempo real")
@@ -78,6 +70,43 @@ def main():
         # Bools que guardan los records
         records_superados_temp_bool, previous_record_temp_info = check_record_breaks(max_temp_12h_estaciones, records_temp_estaciones)
         records_superados_pluv_bool, previous_record_pluv_info = check_record_breaks(sum_pluv_12h_estaciones, records_pluv_estaciones)
+    except:
+        print(f"Error en main", flush=True)
+        import traceback
+        traceback.print_exc()
+
+    return (
+        records_superados_temp_bool,
+        previous_record_temp_info,
+        max_temp_12h_estaciones,
+        records_superados_pluv_bool,
+        previous_record_pluv_info,
+        sum_pluv_12h_estaciones
+    )
+
+def main():
+    # Configurar logs
+    configurar_logging()
+    
+    logging.info(f"Python version: {sys.version}")
+    
+    # Ruta al archivo CSV relativa al archivo actual. Usado para csv's.
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    # Actualizar los csvs
+    if False:
+        lecutura_extremos_actualizar_csvs()
+
+    if False:
+        # Obteniendo los bools de los records
+        (
+            records_superados_temp_bool,
+            previous_record_temp_info,
+            max_temp_12h_estaciones,
+            records_superados_pluv_bool,
+            previous_record_pluv_info,
+            sum_pluv_12h_estaciones
+        ) = get_records_data(BASE_DIR)
 
         # keys que contienen los idemas que superaron la T max
         idemas_tmax_mes_superada = []
@@ -107,29 +136,24 @@ def main():
                     logging.info(f"Día de hoy{sum_pluv_12h_estaciones[key]}.")
                     logging.info(f"Día histórico{previous_record_pluv_info[key]}.")
 
-        logging.info("Acabando programa")
+    logging.info("Acabando programa")
 
-        # Twittear
-        # post_tweet("Bot funcionando con Tweepy Client y OAuth1 user context")
-        # Marcar el periodo de refresco del cálculo de variables
-        # periodo_horas = 12
-        # periodo_segundos = periodo_horas*3600
-        periodo_segundos = 10
+    # Twittear
+    # post_tweet("Bot funcionando con Tweepy Client y OAuth1 user context")
+    # Marcar el periodo de refresco del cálculo de variables
+    # periodo_horas = 12
+    # periodo_segundos = periodo_horas*3600
+    periodo_segundos = 10
 
-        while True:
-            # Cálculo de la hora actual
-            current_time = datetime.datetime.now()
-            logging.info(f"[{current_time.strftime('%Y-%m-%d %H:%M:%S')}] hey")
+    while True:
+        # Cálculo de la hora actual
+        current_time = datetime.datetime.now()
+        logging.info(f"[{current_time.strftime('%Y-%m-%d %H:%M:%S')}] hey")
 
-            # Ejecutar acción periódica
+        # Ejecutar acción periódica
 
-            # Esperar hasta el próximo intervalo
-            time.sleep(periodo_segundos)
-
-    except:
-        print(f"Error en main", flush=True)
-        import traceback
-        traceback.print_exc()
+        # Esperar hasta el próximo intervalo
+        time.sleep(periodo_segundos)
 
 if __name__ == "__main__":
     main()
