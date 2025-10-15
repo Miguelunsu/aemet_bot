@@ -10,8 +10,9 @@ from fetch.extreme_csv_writer_from_aemet import lectura_absolutas_aemet
 from utils.logger import configurar_logging
 from datetime import date
 import datetime
-from bot.twitter_bot import post_tweet
+from bot.twitter_bot import post_tweet, scheduler
 import logging
+from datetime import datetime
 
 def lecutura_extremos_actualizar_csvs(BASE_DIR):
     # Leyendo datos de todas las estaciones (temp y pluv) y actualiza los csvs
@@ -97,6 +98,7 @@ def main():
     if False:
         lecutura_extremos_actualizar_csvs()
 
+    # Encontrar los records
     if False:
         # Obteniendo los bools de los records
         (
@@ -108,6 +110,8 @@ def main():
             sum_pluv_12h_estaciones
         ) = get_records_data(BASE_DIR)
 
+    # showcase de los records
+    if False:
         # keys que contienen los idemas que superaron la T max
         idemas_tmax_mes_superada = []
         logging.info("Estaciones que superaron su T máxima:")
@@ -136,10 +140,10 @@ def main():
                     logging.info(f"Día de hoy{sum_pluv_12h_estaciones[key]}.")
                     logging.info(f"Día histórico{previous_record_pluv_info[key]}.")
 
-    logging.info("Acabando programa")
-
+    # schudeler
+    scheduler(horas=["22:40","22:44"])
     # Twittear
-    # post_tweet("Bot funcionando con Tweepy Client y OAuth1 user context")
+    post_tweet("Hola!")
     # Marcar el periodo de refresco del cálculo de variables
     # periodo_horas = 12
     # periodo_segundos = periodo_horas*3600
