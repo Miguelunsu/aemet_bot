@@ -10,7 +10,7 @@ from fetch.extreme_csv_writer_from_aemet import lectura_absolutas_aemet
 from utils.logger import configurar_logging
 from datetime import date
 import datetime
-from bot.twitter_bot import post_tweet, scheduler
+from bot.twitter_bot import post_tweet, scheduler, create_tweet
 import logging
 from datetime import datetime
 
@@ -99,7 +99,7 @@ def main():
         lecutura_extremos_actualizar_csvs()
 
     # Encontrar los records
-    if False:
+    if True:
         # Obteniendo los bools de los records
         (
             records_superados_temp_bool,
@@ -111,7 +111,7 @@ def main():
         ) = get_records_data(BASE_DIR)
 
     # showcase de los records
-    if False:
+    if True:
         # keys que contienen los idemas que superaron la T max
         idemas_tmax_mes_superada = []
         logging.info("Estaciones que superaron su T máxima:")
@@ -122,10 +122,24 @@ def main():
                     logging.info(f"-> Superada la ABSOLUTA: {key}")
                     logging.info(f"Día de hoy{max_temp_12h_estaciones[key]}.")
                     logging.info(f"Día histórico{previous_record_temp_info[key]}.")
+
+                    tweet_text = create_tweet(max_temp_12h_estaciones[key],
+                                 previous_record_temp_info[key],
+                                 key,
+                                 "temp_max",
+                                 BASE_DIR)
+                    post_tweet(tweet_text)
                 else:
                     logging.info(f"-> Superada la MENSUAL la estacion: {key}.")
                     logging.info(f"Día de hoy{max_temp_12h_estaciones[key]}.")
                     logging.info(f"Día histórico{previous_record_temp_info[key]}.")
+
+                    tweet_text = create_tweet(max_temp_12h_estaciones[key],
+                                 previous_record_temp_info[key],
+                                 key,
+                                 "temp_max",
+                                 BASE_DIR)
+                    post_tweet(tweet_text)
 
         logging.info("Estaciones que superaron su prec máxima:")
         for key, valores in records_superados_pluv_bool.items():
@@ -141,23 +155,7 @@ def main():
                     logging.info(f"Día histórico{previous_record_pluv_info[key]}.")
 
     # schudeler
-    scheduler(horas=["22:40","22:44"])
-    # Twittear
-    post_tweet("Hola!")
-    # Marcar el periodo de refresco del cálculo de variables
-    # periodo_horas = 12
-    # periodo_segundos = periodo_horas*3600
-    periodo_segundos = 10
-
-    while True:
-        # Cálculo de la hora actual
-        current_time = datetime.datetime.now()
-        logging.info(f"[{current_time.strftime('%Y-%m-%d %H:%M:%S')}] hey")
-
-        # Ejecutar acción periódica
-
-        # Esperar hasta el próximo intervalo
-        time.sleep(periodo_segundos)
-
+    # scheduler(horas=["22:40","22:44"])
+    
 if __name__ == "__main__":
     main()

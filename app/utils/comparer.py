@@ -22,7 +22,7 @@ def check_record_breaks(max_value_12h_estaciones, redords_estaciones):
         # Extrayendo el string de tmax de 12h AQUI EL tmax_str ES UN FLOAT, SE PUEDE CAMBIAR (EJEPLO 31.1)
         ole = max_value_12h_estaciones[idema]
         value_float = max_value_12h_estaciones[idema]["value"]
-        if idema == "7012C":
+        if idema == "0009X":
             pass
         # Comprobamos que no sea un string "NaN"
         try:
