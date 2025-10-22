@@ -19,7 +19,7 @@ def get_data_url_from_aemet(endpoint, max_retries=30, delay=8):
     attempts = 0
     while attempts < max_retries:
         try:
-            logging.info(f"Intento {attempts+1}/{max_retries} consultando endpoint")
+            logging.info(f"get_data_url_from_aemet: intento {attempts+1}/{max_retries} consultando endpoint")
             response = requests.get(endpoint, headers=headers)
             data = response.json()
             
@@ -58,20 +58,49 @@ def get_data_url_from_aemet(endpoint, max_retries=30, delay=8):
     print(f"No se pudo obtener la URL de datos tras {max_retries} intentos. Devolviendo string NaN")
     return None
     
-def download_data_from_url(data_url, retries=10, delay=5):
+def download_data_from_url(data_url, max_retries=10, delay=8):
     logging.info(f"Iniciando download_data_from_url. Data url: {data_url}")
-    if data_url == "Nan":
-        logging.warning("Input: string Nan. Devolviendo un string Nan en download_data_from_url.")
+    if not data_url or str(data_url).lower() == "nan":
+        logging.warning("Input: string NaN. Devolviendo None en download_data_from_url.")
         return None
-    for intento in range(retries):
+
+    for intento in range(max_retries):
         try:
+            time.sleep(1) # pequeño cooldown para la web de aemet, que lo necesita
+
             response = requests.get(data_url, timeout=30)
+            # Si el servidor responde, pero con error 500, raise_for_status lanza excepción
             response.raise_for_status()
+
+            # Si todo va bien:
+            logging.info(f"Datos descargados correctamente en intento {intento}.")
             return response.json()
         except requests.exceptions.RequestException as e:
-            logging.warning(f"Intento {intento+1} fallido por error de red: {e}")
+            code = getattr(e.response, "status_code", None)
+            logging.warning(f"Intento {intento}: error HTTP {code} -> {e}")
+
+            # Si es un error 500-599 (servidor), reintentamos
+            if code and 500 <= code < 600:
+                time.sleep(delay * intento)  # backoff exponencial
+                continue
+            else:
+                # Si es 400 o similar, no sirve reintentar
+                break
+
+        except requests.exceptions.Timeout:
+            logging.warning(f"Intento {intento}: tiempo de espera agotado. Reintentando...")
+            time.sleep(delay * intento)
+            continue
+
+        except requests.exceptions.ConnectionError:
+            logging.warning(f"Intento {intento}: error de conexión. Reintentando...")
+            time.sleep(delay * intento)
+            continue
+
         except Exception as e:
-            logging.error(f"Intento {intento+1} fallido por error inesperado: {e}")
-        time.sleep(delay)
-    logging.info(f"No se pudo obtener la data tras {retries} intentos. Devolviendo string NaN")
+            logging.error(f"Intento {intento}: error inesperado -> {e}")
+            break
+        
+    time.sleep(delay)
+    logging.error(f"No se pudo obtener la data tras {max_retries} intentos. Devolviendo None.")
     return None

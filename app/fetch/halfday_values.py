@@ -17,7 +17,7 @@ def get_12h_values(meteo_var):
     # data_url: str con el enlace a los datos de 12 horas (e.g., https://opendata.aemet.es/opendata/sh/cfca0eb5)
     data_url = get_data_url_from_aemet(endpoint)
     # data: lista de diccionarios de estaciones meteo. Cada diccionario tiene toda la info de las 12 últimas horas
-    data = download_data_from_url(data_url, retries=10)
+    data = download_data_from_url(data_url, max_retries=10)
     logging.info(f"Datos descargados. Lineas: {len(data)}")
 
     # Si el data es "nan" es que no se ha podido conectar nada
@@ -29,12 +29,12 @@ def get_12h_values(meteo_var):
         extreme_value_12h_estaciones = get_station_max_last12h(data, meteo_var=meteo_var)
 
         # PARA TESTING/TESTEAR: incluir artificialmente records
-        extreme_value_12h_estaciones["0009X"]["value"] = 33
+        extreme_value_12h_estaciones["0009X"]["value"] = 1234
         
     elif meteo_var == "prec": # entonces queremos la suma
         extreme_value_12h_estaciones = get_station_sum_last12h(data, meteo_var=meteo_var)
 
         # PARA TESTING/TESTEAR: incluir artificialmente records
-        extreme_value_12h_estaciones["0009X"]["value"] = 100000
+        extreme_value_12h_estaciones["0009X"]["value"] = 1234
     logging.info(f"Valores extremos de T obtenidos. Número de estaciones encontradas: {len(extreme_value_12h_estaciones.keys())}")
     return extreme_value_12h_estaciones

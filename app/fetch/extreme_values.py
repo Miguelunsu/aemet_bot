@@ -13,7 +13,7 @@ def get_station_max_last12h(data, meteo_var):
     for idx, est_i in enumerate(data, start=1):
 
         idema = est_i.get("idema", "Nan")
-        logging.info(f"Estudiando {meteo_var}: {idx}/{len(data)} - {idema}, {est_i.get('fint')}")
+        logging.debug(f"Estudiando {meteo_var}: {idx}/{len(data)} - {idema}, {est_i.get('fint')}")
 
         # Si en el diccionario ya hemos visto esta key de idema
         if idema in est_extreme_12h:
@@ -50,7 +50,7 @@ def get_station_sum_last12h(data, meteo_var):
     for idx, est_i in enumerate(data, start=1):
 
         idema = est_i.get("idema", "Nan")
-        logging.info(f"Estudiando {meteo_var}: {idx}/{len(data)} - {idema}, {est_i.get('fint')}")
+        logging.debug(f"Estudiando {meteo_var}: {idx}/{len(data)} - {idema}, {est_i.get('fint')}")
 
         # Si en el diccionario ya hemos visto esta key de idema
         if idema in est_extreme_12h:

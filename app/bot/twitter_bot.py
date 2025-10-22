@@ -127,13 +127,13 @@ def create_tweet(record_superado, previous_record_info, idema, variable_record, 
         if mensual_o_abs == "abs":
             tweet =f"❗La estación de {ubi_ok} ha superado el récord histórico de máxima precipitación acumulada registrada.\n"\
                 f"Se ha registrado una precipitación acumulada de {record_superado["value"]}mm el "\
-                f"{date_fint.strftime("%D")} de {mes_en_string_con_integer(date_fint.strftime("%m"))} a las {date_fint.strftime("%H:%M")}.\n"\
+                f"{date_fint.strftime("%D")} de {mes_en_string_con_integer(date_fint.strftime("%m"))}.\n"\
                 f"El anterior récord era de {previous_record_info["value"]}mm registrado el "\
                 f"{previous_record_info["dia"]}/{previous_record_info["mes"]}/{previous_record_info["anio"]}."
         elif mensual_o_abs == "mensual":
             tweet =f"La estación de {ubi_ok} ha superado el récord de máxima precipitación acumulada registrada en {mes_en_string_con_integer(date_fint.strftime("%m"))}.\n"\
                 f"Se ha registrado una precipitación acumulada de {record_superado["value"]}mm el "\
-                f"{date_fint.strftime("%D")} de {mes_en_string_con_integer(date_fint.strftime("%m"))} a las {date_fint.strftime("%H:%M")}.\n"\
+                f"{date_fint.strftime("%D")} de {mes_en_string_con_integer(date_fint.strftime("%m"))}.\n"\
                 f"El anterior récord era de {previous_record_info["value"]}mm registrado el "\
                 f"{previous_record_info["dia"]}/{previous_record_info["mes"]}/{previous_record_info["anio"]}."
         else:
