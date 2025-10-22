@@ -1,5 +1,6 @@
 import csv
 import os
+from datetime import datetime
 
 class Estacion:
     def __init__(self, idema, ubi, lon, lat):
@@ -11,7 +12,7 @@ class Estacion:
         return f"<Estacion {self.idema} - {self.ubi}>"
         
     
-def Estacion_clase_reader(BASE_DIR):
+def read_estaciones_from_csv(BASE_DIR):
     # Lee como clases de estaciones todas las estaciones del csv de estaciones
 
     # Obtencion del path de estaciones.csv
@@ -52,3 +53,13 @@ def capitalizar_ubi(ubi):
     ubi = ubi.replace(" Los ", " los ")
     ubi = ubi.replace(" Las ", " Las ")
     return ubi
+
+def parser_fint(fint):
+    # Parsea el fint. El fint tiene el aspecto "2025-10-19T13:00:00+0000"
+    # dt tiene formato fecha con localizacion (datetime.datetime(2025, 10, 19, 13, 0, tzinfo=datetime.timezone.utc)) 
+    dt = datetime.strptime(fint, "%Y-%m-%dT%H:%M:%S%z")
+
+    # dt_naive carece de esto (datetime.datetime(2025, 10, 19, 13, 0))
+    dt_naive = dt.replace(tzinfo=None)
+
+    return dt_naive

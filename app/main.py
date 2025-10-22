@@ -110,7 +110,7 @@ def main():
             sum_pluv_12h_estaciones
         ) = get_records_data(BASE_DIR)
 
-    # showcase de los records
+    # Bucle para twittear los records
     if True:
         # keys que contienen los idemas que superaron la T max
         idemas_tmax_mes_superada = []
@@ -127,7 +127,9 @@ def main():
                                  previous_record_temp_info[key],
                                  key,
                                  "temp_max",
+                                 "abs",
                                  BASE_DIR)
+                    
                     post_tweet(tweet_text)
                 else:
                     logging.info(f"-> Superada la MENSUAL la estacion: {key}.")
@@ -138,7 +140,9 @@ def main():
                                  previous_record_temp_info[key],
                                  key,
                                  "temp_max",
+                                 "mensual",
                                  BASE_DIR)
+                    
                     post_tweet(tweet_text)
 
         logging.info("Estaciones que superaron su prec máxima:")
@@ -149,10 +153,28 @@ def main():
                     logging.info(f"-> Superada la ABSOLUTA: {key}")
                     logging.info(f"Día de hoy{sum_pluv_12h_estaciones[key]}.")
                     logging.info(f"Día histórico{previous_record_pluv_info[key]}.")
+
+                    tweet_text = create_tweet(sum_pluv_12h_estaciones[key],
+                                 previous_record_pluv_info[key],
+                                 key,
+                                 "pluv_max",
+                                 "abs",
+                                 BASE_DIR)
+                    
+                    post_tweet(tweet_text)
                 else:
                     logging.info(f"-> Superada la MENSUAL la estacion: {key}.")
                     logging.info(f"Día de hoy{sum_pluv_12h_estaciones[key]}.")
                     logging.info(f"Día histórico{previous_record_pluv_info[key]}.")
+
+                    tweet_text = create_tweet(sum_pluv_12h_estaciones[key],
+                                 previous_record_pluv_info[key],
+                                 key,
+                                 "pluv_max",
+                                 "mensual",
+                                 BASE_DIR)
+                    
+                    post_tweet(tweet_text)
 
     # schudeler
     # scheduler(horas=["22:40","22:44"])
