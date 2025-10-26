@@ -19,11 +19,14 @@ def check_record_breaks(max_value_12h_estaciones, redords_estaciones):
         
     # Bucle para ver si hay alguna estación en la que se ha superado la tmax
     for idema in max_value_12h_estaciones:     
+        
         # Extrayendo el string de tmax de 12h AQUI EL tmax_str ES UN FLOAT, SE PUEDE CAMBIAR (EJEPLO 31.1)
-        ole = max_value_12h_estaciones[idema]
         value_float = max_value_12h_estaciones[idema]["value"]
+        
+        # Debuging
         if idema == "0009X":
             pass
+        
         # Comprobamos que no sea un string "NaN"
         try:
             value_float = float(value_float)
@@ -55,7 +58,7 @@ def check_record_breaks(max_value_12h_estaciones, redords_estaciones):
                 continue
             
             # empezamos estudiando la del mes
-            if valor_record_mensual is not None and value_float > valor_record_mensual:
+            if valor_record_mensual is not None and value_float > (valor_record_mensual + 0.5):
                 records_superados_bool[idema]["valor_superado_mes"] = True
                 
                 previous_record_info[idema] = {
@@ -67,7 +70,7 @@ def check_record_breaks(max_value_12h_estaciones, redords_estaciones):
                 logging.debug(f"Valor máximo del mes superada en {idema}: actual {value_float} > histórico del mes {valor_record_mensual}")
 
                 # Ahora obtenemos la mas alta absoluta
-                if valor_record_absoluto is not None and value_float > valor_record_absoluto:
+                if valor_record_absoluto is not None and value_float > (valor_record_absoluto + 0.5):
                     records_superados_bool[idema]["valor_superado_abs"] = True
                     previous_record_info[idema] = {
                         "dia": redord_idema.get("absoluto_dia"),
