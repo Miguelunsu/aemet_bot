@@ -1,4 +1,3 @@
-from utils.auxiliar import string_a_float_con_decimal
 import logging
 from datetime import date
 

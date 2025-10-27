@@ -1,9 +1,8 @@
-import os                       # Permite acceder a variables de entorno
-from dotenv import load_dotenv  # Carga variables del archivo .env
-import tweepy                   # Librería oficial de Twitter/X para Python
-import time
-from datetime import datetime
-from datetime import date
+import os
+from dotenv import load_dotenv
+import tweepy
+import logging
+
 from data.estacion import read_estaciones_from_csv, encontrar_ubi_con_idema, capitalizar_ubi, parser_fint
 
 # Cargar las variables de entorno desde el archivo .env
@@ -28,28 +27,6 @@ client = tweepy.Client(
     access_token=access_token,
     access_token_secret=access_secret
 )
-
-# Función disparador para las horas
-def scheduler(horas=["00:10","12:10"]):
-    
-    ejecutado_hoy = dict.fromkeys(horas, True)
-
-    while True:
-        ahora = datetime.now()
-        hora_actual = f"{ahora.hour:02d}:{ahora.minute:02d}" # formato 00:10
-
-        # Comprobar cada hora objetivo
-        for objetivo in ejecutado_hoy:
-            if hora_actual == objetivo and not ejecutado_hoy[objetivo]:
-                post_tweet(f"Test hora {hora_actual}")
-                ejecutado_hoy[objetivo] = True
-
-        # Reiniciar flags a la primera hora marcada en la variable horas
-        if hora_actual == horas[0]:
-            for key in ejecutado_hoy:
-                ejecutado_hoy[key] = False
-
-        time.sleep(30)  # Espera 30 segundos antes de volver a comprobar
 
 # Función para publicar un tweet
 def post_tweet(tweet_text: str):
@@ -153,10 +130,72 @@ def create_tweet(record_superado, previous_record_info, idema, variable_record, 
                 f"{previous_record_info["dia"]}/{previous_record_info["mes"]}/{previous_record_info["anio"]}."
         else:
             raise Exception  
-        
-        
-
 
     else:
         raise Exception           
     return tweet
+
+def tweet_manager(  records_superados_temp_bool,
+                    previous_record_temp_info,
+                    max_temp_12h_estaciones,
+                    records_superados_pluv_bool,
+                    previous_record_pluv_info,
+                    sum_pluv_12h_estaciones,
+                    sumar_o_guardar_cum,
+                    BASE_DIR):
+    # Esta función, con toda la info de los records, lanza el tweet que se necesita.
+    # la funcion sumar_o_guardar_cum guarda o suma los comulativos de un csv (para lluvias)
+
+    # keys que contienen los idemas que superaron la T max
+    idemas_tmax_mes_superada = []
+    for key, valores in records_superados_temp_bool.items():
+        if valores.get("valor_superado_mes") is True:
+            idemas_tmax_mes_superada.append(key)
+            if valores.get("valor_superado_abs") is True:
+                logging.info(f"{key} Temp: superada la ABSOLUTA. Día de hoy{max_temp_12h_estaciones[key]}. Día histórico{previous_record_temp_info[key]}.")
+                tweet_text = create_tweet(max_temp_12h_estaciones[key],
+                                previous_record_temp_info[key],
+                                key,
+                                "temp_max",
+                                "abs",
+                                BASE_DIR)
+                
+                post_tweet(tweet_text)
+            else:
+                logging.info(f"{key} Temp: superada la MENSUAL. Día de hoy{max_temp_12h_estaciones[key]}. Día histórico{previous_record_temp_info[key]}.")
+                tweet_text = create_tweet(max_temp_12h_estaciones[key],
+                                previous_record_temp_info[key],
+                                key,
+                                "temp_max",
+                                "mensual",
+                                BASE_DIR)
+                
+                post_tweet(tweet_text)
+
+    for key, valores in records_superados_pluv_bool.items():
+        if valores.get("valor_superado_mes") is True:
+            idemas_tmax_mes_superada.append(key)
+            if valores.get("valor_superado_abs") is True:
+                logging.info(f"{key} Prec: superada la ABSOLUTA. Día de hoy{max_temp_12h_estaciones[key]}. Día histórico{previous_record_temp_info[key]}.")
+
+                tweet_text = create_tweet(sum_pluv_12h_estaciones[key],
+                                previous_record_pluv_info[key],
+                                key,
+                                "pluv_max",
+                                "abs",
+                                BASE_DIR)
+                
+                post_tweet(tweet_text)
+            else:
+                logging.info(f"{key} Prec: superada la MENSUAL. Día de hoy{max_temp_12h_estaciones[key]}. Día histórico{previous_record_temp_info[key]}.")
+
+                tweet_text = create_tweet(sum_pluv_12h_estaciones[key],
+                                previous_record_pluv_info[key],
+                                key,
+                                "pluv_max",
+                                "mensual",
+                                BASE_DIR)
+                
+                post_tweet(tweet_text)
+    
+    logging.info("Fin tweet_manager")
