@@ -8,7 +8,7 @@ from utils.auxiliar import scheduler
 from fetch.extreme_csv_writer_from_aemet import lectura_absolutas_aemet
 
 # horas a las que se activa el bot (lapso de 12 horas para que el cumulative prec funcione)
-horas_scheduler = ["23:59","23:45"]
+horas_scheduler = ["00:52","00:54"]
 
 def lecutura_extremos_actualizar_csvs(BASE_DIR):
     # Leyendo datos de todas las estaciones (temp y pluv) y actualiza los csvs

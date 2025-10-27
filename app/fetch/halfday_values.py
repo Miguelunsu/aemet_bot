@@ -29,12 +29,12 @@ def get_12h_values(meteo_var):
         extreme_value_12h_estaciones = get_station_max_last12h(data, meteo_var=meteo_var)
 
         # PARA TESTING/TESTEAR: incluir artificialmente records
-        extreme_value_12h_estaciones["0009X"]["value"] = 1234
+        # extreme_value_12h_estaciones["0009X"]["value"] = 1234
         
     elif meteo_var == "prec": # entonces queremos la suma
         extreme_value_12h_estaciones = get_station_sum_last12h(data, meteo_var=meteo_var)
 
         # PARA TESTING/TESTEAR: incluir artificialmente records
-        extreme_value_12h_estaciones["0009X"]["value"] = 5678
+        # extreme_value_12h_estaciones["0009X"]["value"] = 5678
     logging.info(f"Valores extremos de T obtenidos. Número de estaciones encontradas: {len(extreme_value_12h_estaciones.keys())}")
     return extreme_value_12h_estaciones

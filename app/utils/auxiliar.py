@@ -3,11 +3,13 @@ import os
 from datetime import date
 from datetime import datetime
 import time
+import math
 
 from fetch.csv_reader import get_max_values_current_month
 from fetch.halfday_values import get_12h_values
 from utils.comparer import check_record_breaks
 from bot.twitter_bot import tweet_manager
+from utils.prec_cummulative import guardar_valores_en_csv, leer_csv_a_diccionario, borrar_csv
 
 def get_records_data(BASE_DIR):
     # Obtiene la info de los records
@@ -101,6 +103,23 @@ def scheduler(BASE_DIR,
                     sum_pluv_12h_estaciones
                 ) = get_records_data(BASE_DIR)
                 
+                if hora_actual == horas[0]: # primera hora: guardamos csv. Seguimos como si nada.
+                    guardar_valores_en_csv(sum_pluv_12h_estaciones)
+                elif hora_actual == horas[-1]: # ultima hora: recogemos lo del csv y lo sumamos. Es el cumulativo del dia
+                    datos_previos = leer_csv_a_diccionario()
+                    # Se hace la suma
+                    for idema, valor in datos_previos.items():
+                        try:
+                            valor = float(valor)
+                            if not math.isnan(valor):
+                                sum_pluv_12h_estaciones[idema]["value"] = sum_pluv_12h_estaciones[idema]["value"] + valor
+                        except (TypeError, ValueError):
+                            pass
+                    # se borra el contenido del csv
+                    borrar_csv()
+                else:
+                    pass
+
                 # Hacer todo el proceso de los tweets:
                 tweet_manager(  records_superados_temp_bool,
                                 previous_record_temp_info,
